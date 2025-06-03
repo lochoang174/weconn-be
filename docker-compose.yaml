@@ -1,0 +1,35 @@
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
+      target: development
+    command: npm run start:dev
+    env_file:
+      - ./apps/gateway/.env
+    depends_on:
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3000:3000'
+  crawl:
+    build:
+      context: .
+      dockerfile: ./apps/crawl/Dockerfile
+      target: development
+    command: npm run start:crawl 
+    env_file:
+      - ./apps/crawl/.env
+    depends_on:
+      - rabbitmq
+      - gateway
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+  rabbitmq:
+    image: rabbitmq:3-management # Dùng bản có giao diện quản lý sẽ hữu ích
+    ports:
+      - '5672:5672' # Cổng AMQP
+      - '15672:15672' # Cổng giao diện quản lý
