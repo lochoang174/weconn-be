@@ -4,6 +4,8 @@ import { CrawlController } from './crawl.controller';
 import { RmqModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
+import { SagaInstanceModule } from '../saga-instance/saga-instance.module';
+import { SagaStepModule } from '../saga-step/saga-step.module';
 
 @Module({
   controllers: [CrawlController],
@@ -16,6 +18,8 @@ import { join } from 'path';
     RmqModule.register({
       name: 'CRAWL',
     }),
+    SagaInstanceModule,
+    SagaStepModule,
   ],
 })
 export class CrawlModule {}

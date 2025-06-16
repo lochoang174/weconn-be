@@ -4,10 +4,14 @@ import { CrawlProfileDto } from './dto/crawlProfile.dto';
 
 @Controller('crawl')
 export class CrawlController {
-  constructor(private readonly crawlService: CrawlService) {}
+  constructor(private readonly crawlService: CrawlService) { }
   @Post("/")
   async crawlListProfile(@Body() data: CrawlProfileDto) {
     return this.crawlService.crawlProfile(data)
   }
+  @Post("single")
+  async crawlSingleProfile(@Body() data: CrawlProfileDto) {
 
+    return this.crawlService.crawlSingleProfile(data)
+  }
 }

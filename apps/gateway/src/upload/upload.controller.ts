@@ -8,7 +8,7 @@ import {
   BadRequestException,
 
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService, CloudinaryUploadResult } from '../cloudinary/cloudinary.service';
 
 export class UploadSingleDto {

@@ -19,7 +19,7 @@ export class SocketService {
     async registerUserSocket(
         userId: string,
         socketId: string,
-        eventName: string, // New parameter for the event name (e.g., 'guest_response')
+        eventName: string, 
     ): Promise<void> {
         const ttl = 3600 * 24; // 24 hours
 
@@ -29,13 +29,11 @@ export class SocketService {
             `Đã đăng ký (set) mapping cho userId '${userId}' với socketId '${socketId}'`,
         );
 
-        // Construct the pending response key dynamically using the eventName
-        // Assuming the desired format is EVENT_NAME_USERID (e.g., GUEST_RESPONSE_userId)
+
         const pendingResponseKey = `${eventName.toUpperCase()}_${userId}`;
         this.logger.log(
             `Đang kiểm tra (get) cache cho key phản hồi đang chờ: '${pendingResponseKey}' cho event '${eventName}'`,
         );
-        // console.log(await this.cacheManager.stores) // For debugging cache stores if needed
         const pendingResponse = await this.cacheManager.get<any>(
             pendingResponseKey,
         );

@@ -8,8 +8,8 @@ export class LinkedInProfile {
   @Prop({ required: true })
   username: string;
 
-  @Prop({ required: true })
-  headline: string;
+  @Prop({ required: false })
+  headline?: string;
 
   @Prop({ required: true })
   profilePicture: string;

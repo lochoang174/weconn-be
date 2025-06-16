@@ -15,8 +15,8 @@ export class CrawlService {
   constructor(
     private readonly crawlRepository: CrawlRepository,
     @Inject('MAIN') private client: ClientProxy,
-  ) {}
-  
+  ) { }
+
   getHello(): string {
     return 'Hello World!';
   }
@@ -31,7 +31,13 @@ export class CrawlService {
       console.log('Profile vector created');
     }
   }
-
+  async removeProfile(id: number) {
+    const profile = await this.crawlRepository.findByProfileId(id);
+    if (profile) {
+      await this.crawlRepository.deleteOne({ _id: profile._id })
+      console.log("delete profile does not required")
+    }
+  }
   async crawlSingleprofile(profileUrl: string, apiKey: string) {
     try {
       const encodedUrl = encodeURIComponent(profileUrl);
@@ -42,26 +48,26 @@ export class CrawlService {
           'x-rapidapi-key': `${apiKey}`,
         },
       };
-      
+
       if ((await this.crawlRepository.checkExist(profileUrl)) === false) {
         console.log('Đã có profile này trong database');
         return null;
       }
-      
+
       const url = `https://linkedin-data-api.p.rapidapi.com/get-profile-data-by-url?url=${encodedUrl}`;
       const response = await fetch(url, options);
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      
+
       console.log('Response Headers:');
       response.headers.forEach((value, name) => {
         console.log(`${name}: ${value}`);
       });
-      
+
       const data = await response.json();
-      
+
       // Thêm try-catch cho việc transform data
       let result: ProfileCrawl;
       try {
@@ -92,7 +98,6 @@ export class CrawlService {
     } catch (error) {
       console.error('Error fetching LinkedIn profile data:', error);
       console.error('Profile URL:', profileUrl);
-      throw error;
     }
   }
 
@@ -225,18 +230,18 @@ export class CrawlService {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        // throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      const data = await response.json(); 
-      
+      const data = await response.json();
+
       if (!data.data?.items || !Array.isArray(data.data.items)) {
         console.error('Invalid response format:', data);
-        throw new Error('Invalid response format from LinkedIn API');
+        // throw new Error('Invalid response format from LinkedIn API');
       }
 
       const listProfile = data.data.items;
-      
+
       const results = [];
       for (const profile of listProfile) {
         try {
@@ -256,16 +261,21 @@ export class CrawlService {
     } catch (error) {
       console.error('Error fetching LinkedIn profile list:', error);
       console.error('URL processed:', urlProcessed);
-      throw error;
     }
   }
-  async getProfileInfo(data: any){
-    let result =[] 
+  async getProfileInfo(data: any) {
+    let result = []
     console.log(data)
-    for(let element of data.results ){
-      let temp =await this.crawlRepository.findByProfileId(element.id_profile)
-      result.push(temp)
+    for (let element of data.results) {
+      let temp = await this.crawlRepository.findByProfileId(element.id_profile)
+      //@ts-ignore
+
+      if (temp && temp._doc) {
+        //@ts-ignore
+        result.push({ ...temp._doc, "score": element.score })
+      }
     }
-    this.client.emit('profile_info', {"result":result,"id":data.id});
+    console.log(result)
+    this.client.emit('profile_info', { "result": result, "id": data.id });
   }
 }

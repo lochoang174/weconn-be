@@ -23,16 +23,26 @@ export class ImageSearchConsumer {
     private readonly cloudinaryService: CloudinaryService) { }
 
   @EventPattern('vector_created')
-  async handleVectorCreated(@Payload() data: any) {
+  async handleVectorCreated(@Payload() data: any,@Ctx() context: RmqContext) {
     console.log('Received vector_created event:', data);
     this.client.emit("profile_vector_created", { "id": data.id_profile })
+    this.rmqService.ack(context);
+
+  }
+  @EventPattern('vector_created_failed')
+  async handleVectorCreatedFailed(@Payload() data: any,@Ctx() context: RmqContext) {
+    console.log('Received vector_created event:', data);
+    this.client.emit("profile_vector_created_failed", { "id": data.id_profile })
+        this.rmqService.ack(context);
+
 
   }
   @EventPattern('search_face_result')
   async handlerSearchResult(@Payload() data: any, @Ctx() context: RmqContext) {
     console.log('Received search_face_result event:', data);
     this.client.emit("get_profile_info", data)
-
+ 
+    this.rmqService.ack(context);
 
   }
   @EventPattern('face_detector_response')

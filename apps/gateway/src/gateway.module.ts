@@ -9,6 +9,9 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { SocketModule } from './socket/socket.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ImageSearchModule } from './image-search/image-search.module';
+import { DatabaseModule } from '@app/common';
+import { SagaStepModule } from './saga-step/saga-step.module';
+import { SagaInstanceModule } from './saga-instance/saga-instance.module';
 
 @Module({
   imports: [
@@ -21,7 +24,13 @@ import { ImageSearchModule } from './image-search/image-search.module';
         isGlobal: true,
         ttl:3600
     }),
-    ImageSearchModule
+    ImageSearchModule,
+    DatabaseModule.forRoot({
+          saga: 'SAGA_URI',
+        }),
+    SagaStepModule,
+    SagaInstanceModule,
+ 
   
   ],
   controllers: [GatewayController],

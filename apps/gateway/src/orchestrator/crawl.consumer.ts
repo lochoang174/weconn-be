@@ -13,8 +13,8 @@ import { SocketService } from '../socket/socket.service';
 
 @Controller()
 export class CrawlConsumer {
-    private readonly logger = new Logger(CrawlConsumer.name);
-  
+  private readonly logger = new Logger(CrawlConsumer.name);
+
   constructor(@Inject('IMAGE') private client: ClientProxy,
     private readonly rmqService: RmqService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -27,26 +27,21 @@ export class CrawlConsumer {
     let payload = { profilePicture: data.profilePicture, id: data.id };
     console.log(payload);
     this.client.emit('face_indexing', payload);
-    // TODO: Add your business logic here to handle the profile creation
-    try {
+    this.rmqService.ack(context);
 
-      return { success: true, message: 'Profile processed successfully' };
-    } catch (error) {
-      console.error('Error processing profile:', error);
-      return { success: false, error: error.message };
-    }
+
+
   }
   @EventPattern('profile_info')
   async handleResponseProfile(@Payload() data: any, @Ctx() context: RmqContext) {
 
     console.log(data.id)
-    if (!data  ) {
+    if (!data) {
       this.logger.error(
         'Invalid data for face_detector_response. Missing id, url, or faces.',
         data,
       );
-      this.rmqService.ack(context); // Acknowledge to remove from queue
-      return;
+      this.rmqService.ack(context);
     }
     const userId = data.id.toString();
     const ttlInSeconds = 360000;

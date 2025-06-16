@@ -5,8 +5,12 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { RmqService } from '@app/common';
 import { RmqOptions } from '@nestjs/microservices';
 async function bootstrap() {
-  const app = await NestFactory.create(GatewayModule);
-  app.useGlobalPipes(new ValidationPipe());
+  const app = await NestFactory.create(GatewayModule, {
+    cors: {
+      origin: 'http://localhost:3001',
+      credentials: true,
+    },
+  });  app.useGlobalPipes(new ValidationPipe());
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice<RmqOptions>(rmqService.getOptions('MAIN', false));
 
