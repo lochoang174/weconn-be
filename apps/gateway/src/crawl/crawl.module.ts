@@ -6,6 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { SagaInstanceModule } from '../saga-instance/saga-instance.module';
 import { SagaStepModule } from '../saga-step/saga-step.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { BOT_SERVICE_NAME } from 'proto/bot';
 
 @Module({
   controllers: [CrawlController],
@@ -15,11 +17,23 @@ import { SagaStepModule } from '../saga-step/saga-step.module';
           isGlobal: true,
           envFilePath: join(__dirname, '../../../apps/gateway/.env'),
         }),
-    RmqModule.register({
-      name: 'CRAWL',
-    }),
+    // RmqModule.register({
+    //   name: 'CRAWL',
+    // }),
     SagaInstanceModule,
     SagaStepModule,
-  ],
+     ClientsModule.register([
+      {
+        name: BOT_SERVICE_NAME,
+        transport: Transport.GRPC,
+        options: {
+          package: "bot",
+          protoPath: join(__dirname, "../../../proto/bot.proto"), // Đường dẫn đúng
+          url: "localhost:50051", // Quan trọng: Listen trên tất cả interfaces
+        },
+      },
+    ]), 
+  ], 
 })
-export class CrawlModule {}
+export class CrawlModule {} 
+   

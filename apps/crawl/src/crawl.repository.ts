@@ -2,14 +2,14 @@ import { AbstractRepository } from '@app/common';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
-import { ProfileCrawl } from './schemas/profile-crawl.schema';
+import { Bot } from './schemas/bot.schema';
 
 @Injectable()
-export class CrawlRepository extends AbstractRepository<ProfileCrawl> {
+export class CrawlRepository extends AbstractRepository<Bot> {
   protected readonly logger = new Logger(CrawlRepository.name);
-
+ 
   constructor(
-    @InjectModel(ProfileCrawl.name, 'crawl') crawlModel: Model<ProfileCrawl>,
+    @InjectModel(Bot.name, 'crawl') crawlModel: Model<Bot>,
     @InjectConnection('crawl') connection: Connection,
   ) {
     super(crawlModel, connection);

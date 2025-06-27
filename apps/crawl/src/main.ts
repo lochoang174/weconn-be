@@ -20,8 +20,8 @@ async function bootstrap() {
   // );
   const app = await NestFactory.create(CrawlModule);
 
-  const rmqService = app.get<RmqService>(RmqService);
-  app.connectMicroservice<RmqOptions>(rmqService.getOptions('CRAWL', false));
+  // const rmqService = app.get<RmqService>(RmqService);
+  // app.connectMicroservice<RmqOptions>(rmqService.getOptions('CRAWL', false));
 
   await app.startAllMicroservices(); 
 }

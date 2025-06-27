@@ -16,7 +16,7 @@ import { SagaInstanceModule } from './saga-instance/saga-instance.module';
 @Module({
   imports: [
     CrawlModule,
-    OrchestratorModule,
+    // OrchestratorModule,
     UploadModule,
     CloudinaryModule,
     SocketModule,

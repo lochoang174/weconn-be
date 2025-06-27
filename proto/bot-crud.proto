@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package bot;
+
+service BotService {
+  rpc CreateBot (CreateBotRequest) returns (BotResponse);
+  rpc UpdateBot (UpdateBotRequest) returns (BotResponse);
+  rpc DeleteBot (DeleteBotRequest) returns (DeleteBotResponse);
+  rpc GetAllBots (GetAllBotsRequest) returns (GetAllBotsResponse);
+  rpc UpdateAllBotCredentials (UpdateAllBotCredentialsRequest) returns (UpdateAllBotCredentialsResponse);
+}
+
+message Bot {
+  string id = 1; // Mongo ObjectID (hoặc bot_id)
+  string bot_id = 2;
+  string error = 4;
+  string email = 5;
+  string password = 6;
+}
+
+message CreateBotRequest {
+  string bot_id = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message UpdateBotRequest {
+  string id = 1;
+  string email = 2;
+  string password = 3;
+  string status = 4;
+  string error = 5;
+}
+
+message DeleteBotRequest {
+  string id = 1;
+}
+
+message DeleteBotResponse {
+  string message = 1;
+}
+
+message GetAllBotsRequest {}
+
+message GetAllBotsResponse {
+  repeated Bot bots = 1;
+}
+
+message UpdateAllBotCredentialsRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message UpdateAllBotCredentialsResponse {
+  string message = 1; // số lượng bot đã được update
+}
+
+message BotResponse {
+  Bot bot = 1;
+}

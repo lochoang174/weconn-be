@@ -1,5 +1,7 @@
+
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import {
+  ClientGrpc,
   ClientProxy,
   ClientProxyFactory,
   Transport,
@@ -10,36 +12,46 @@ import { SagaStepRepository } from '../saga-step/saga-step.repository';
 import { SagaInstanceStatus } from '../enum/SagaInstanceStatus';
 import { SagaInstanceType } from '../enum/SagaInstanceType';
 import { SagaStepStatus } from '../enum/SagaStepStatus';
+import { BOT_SERVICE_NAME, BotCommand, BotCommand_CommandType, BotServiceClient } from 'proto/bot';
+import { ReplaySubject, Subject } from 'rxjs';
+
 @Injectable()
-export class CrawlService {
-  constructor(@Inject('CRAWL') private client: ClientProxy,
+export class CrawlService implements OnModuleInit {
+  private botService: BotServiceClient;
+  private commandStream$ = new ReplaySubject<BotCommand>(); // giữ stream sống
 
-    private readonly sagaInstanceRepository: SagaInstanceRepository,
-    private readonly sagaStepRepository: SagaStepRepository,
-) {}
+  @Inject(BOT_SERVICE_NAME)
+  private clientGrpc: ClientGrpc;
 
-  async crawlProfile(data: CrawlProfileDto) {
-    const sagaInstance = await this.sagaInstanceRepository.create({
-      status: SagaInstanceStatus.PENDING,
-     type: SagaInstanceType.CRAWL_LIST_PROFILE,
-     requestPayload: data,
-    });
-    const sagaStep = await this.sagaStepRepository.create({
-      sagaInstanceId: sagaInstance._id,
-      status: SagaStepStatus.PENDING,
-      requestPayload: data,
-      order:1,
-      stepName: 'Crawl List Profile',
-    });
-    return this.client.emit('process_crawl', {
-      payload: data,
-      metadata: {
-        sagaInstanceId: sagaInstance._id,
-        sagaStepId: sagaStep._id,
-      }
-    });  }
-  async crawlSingleProfile(data: CrawlProfileDto) {
+  onModuleInit() {
+  this.botService = this.clientGrpc.getService<BotServiceClient>(BOT_SERVICE_NAME);
 
-    return this.client.emit('process_crawl_single', data); // "" nghĩa là default exchange
-  }
+  this.botService.streamBotCrawlUrl(this.commandStream$.asObservable()).subscribe({
+    next: (log) => console.log('📥 Bot log:', log.message),
+    error: (err) => { 
+      console.error('❌ Stream error:', err);
+      // Tùy chọn: tự động reconnect nếu cần
+    }, 
+    complete: () => {
+      console.log('✅ Bot stream completed');
+    },
+  });
+}    
+ 
+ 
+  bot_processing(id:string) {
+    console.log('🚀 Sending START command');
+    this.commandStream$.next({ 
+      botId: id, 
+      type: BotCommand_CommandType.START,   
+    } satisfies BotCommand);
+  } 
+
+  stop_bot_processing(id:string) {
+    console.log('🛑 Sending STOP command');
+    this.commandStream$.next({  
+      botId: id,
+      type: BotCommand_CommandType.STOP, 
+    } satisfies BotCommand);
+  } 
 }

@@ -6,10 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { CrawlRepository } from './crawl.repository';
 import { MongooseModule } from '@nestjs/mongoose';
-import {
-  ProfileCrawl,
-  ProfileCrawlSchema,
-} from './schemas/profile-crawl.schema';
+import { Bot, BotSchema } from './schemas/bot.schema';
+
 
 @Module({
   imports: [
@@ -21,12 +19,12 @@ import {
       crawl: 'CRAWL_URI',
     }),
     MongooseModule.forFeature(
-      [{ name: ProfileCrawl.name, schema: ProfileCrawlSchema }],
-      'crawl',
+      [{ name: Bot.name, schema: BotSchema }],
+      'crawl_bot',
     ),
-    RmqModule.register({
-      name: 'MAIN',
-    }),
+    // RmqModule.register({
+    //   name: 'MAIN',
+    // }),
   ],
   controllers: [CrawlController],
   providers: [CrawlService, CrawlRepository],

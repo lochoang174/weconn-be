@@ -11,8 +11,8 @@ async function bootstrap() {
       credentials: true,
     },
   });  app.useGlobalPipes(new ValidationPipe());
-  const rmqService = app.get<RmqService>(RmqService);
-  app.connectMicroservice<RmqOptions>(rmqService.getOptions('MAIN', false));
+  // const rmqService = app.get<RmqService>(RmqService);
+  // app.connectMicroservice<RmqOptions>(rmqService.getOptions('MAIN', false));
 
 
   await app.startAllMicroservices();
