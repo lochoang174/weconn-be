@@ -42,9 +42,9 @@ export class CrawlService {
     try {
       const encodedUrl = encodeURIComponent(profileUrl);
       const options = {
-        method: 'GET',
+        method: 'Post',
         headers: {
-          'x-rapidapi-host': 'linkedin-data-api.p.rapidapi.com',
+          'x-rapidapi-host': 'fresh-linkedin-profile-data.p.rapidapi.com',
           'x-rapidapi-key': `${apiKey}`,
         },
       };
@@ -54,7 +54,7 @@ export class CrawlService {
         return null;
       }
 
-      const url = `https://linkedin-data-api.p.rapidapi.com/get-profile-data-by-url?url=${encodedUrl}`;
+      const url = `https://fresh-linkedin-profile-data.p.rapidapi.com/google-profiles`;
       const response = await fetch(url, options);
 
       if (!response.ok) {
@@ -81,7 +81,7 @@ export class CrawlService {
       // Thêm try-catch cho việc tạo profile trong database
       let crawlProfile;
       try {
-        crawlProfile = await this.crawlRepository.create(result);
+        // crawlProfile = await this.crawlRepository.create(result);
         console.log('Profile created successfully');
         console.log(crawlProfile);
       } catch (createError) {
@@ -217,15 +217,20 @@ export class CrawlService {
 
   async getListProfile(urlProcessed: string, apiKey: string) {
     try {
-      const url = `https://linkedin-data-api.p.rapidapi.com/search-people-by-url`;
+      const url = `https://fresh-linkedin-profile-data.p.rapidapi.com/google-profiles`;
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'x-rapidapi-host': 'linkedin-data-api.p.rapidapi.com',
+          'x-rapidapi-host': 'fresh-linkedin-profile-data.p.rapidapi.com',
           'x-rapidapi-key': `${apiKey}`,
         },
         body: JSON.stringify({
-          url: urlProcessed,
+          "name": "A",
+          "company": "FPT",
+          "job_title": "",
+          "location": "VietNam",
+          "keyword": "Backend Engineer OR Frontend Engineer OR Product Manager OR Designer ",
+          "page": 1
         }),
       });
 

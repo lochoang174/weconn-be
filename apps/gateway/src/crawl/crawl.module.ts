@@ -4,8 +4,6 @@ import { CrawlController } from './crawl.controller';
 import { RmqModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
-import { SagaInstanceModule } from '../saga-instance/saga-instance.module';
-import { SagaStepModule } from '../saga-step/saga-step.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { BOT_SERVICE_NAME } from 'proto/bot';
 
@@ -13,15 +11,14 @@ import { BOT_SERVICE_NAME } from 'proto/bot';
   controllers: [CrawlController],
   providers: [CrawlService],
   imports: [
-    ConfigModule.forRoot({
-          isGlobal: true,
-          envFilePath: join(__dirname, '../../../apps/gateway/.env'),
-        }),
+    // ConfigModule.forRoot({
+    //       isGlobal: true,
+    //       envFilePath: join(__dirname, '../../../apps/gateway/.env'),
+    //     }),
     // RmqModule.register({
     //   name: 'CRAWL',
     // }),
-    SagaInstanceModule,
-    SagaStepModule,
+
      ClientsModule.register([
       {
         name: BOT_SERVICE_NAME,

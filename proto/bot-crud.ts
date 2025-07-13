@@ -8,29 +8,96 @@
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
 
-export const protobufPackage = "bot";
+export const protobufPackage = "bot_crud";
+
+export interface CheckUrlRequest {
+  url: string;
+}
+
+/** Response cho CheckUrlExists */
+export interface CheckUrlResponse {
+  exists: boolean;
+}
+
+/** Request cho SaveVector */
+export interface SaveVectorRequest {
+  url: string;
+  name: string;
+  picture: string;
+  headline: string;
+  location: string;
+  currentCompany: string;
+  education: string;
+}
+
+/** Response cho SaveVector */
+export interface SaveVectorResponse {
+  /** ID trong Elasticsearch */
+  id: string;
+}
+
+export interface FaceBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  confidence: number;
+}
+
+/** Request gửi vào để detect từ 1 ảnh URL */
+export interface SearchFaceRequest {
+  url: string;
+}
+
+export interface FaceDetectRequest {
+  url: string;
+}
+
+export interface FaceSearchDocument {
+  url: string;
+  name: string;
+  picture: string;
+  gender: string;
+  headline: string;
+  location: string;
+  currentCompany: string;
+  education: string;
+  createdAt: string;
+}
+
+export interface FaceSearchResult {
+  document:
+    | FaceSearchDocument
+    | undefined;
+  /** e.g. "50.98 / 100" */
+  similarityScore: string;
+  rawScore: number;
+  actualCosine: number;
+  id: string;
+}
+
+export interface FaceSearchResponse {
+  results: FaceSearchResult[];
+}
+
+export interface FaceDetectResponse {
+  url: string;
+  faces: FaceBox[];
+}
 
 export interface Bot {
-  /** Mongo ObjectID (hoặc bot_id) */
-  id: string;
   botId: string;
-  error: string;
-  email: string;
-  password: string;
+  cookieUrl: string;
 }
 
 export interface CreateBotRequest {
   botId: string;
-  email: string;
-  password: string;
+  cookieUrl: string;
 }
 
 export interface UpdateBotRequest {
-  id: string;
-  email: string;
-  password: string;
-  status: string;
-  error: string;
+  botId: string;
+  cookieUrl: string;
 }
 
 export interface DeleteBotRequest {
@@ -48,12 +115,11 @@ export interface GetAllBotsResponse {
   bots: Bot[];
 }
 
-export interface UpdateAllBotCredentialsRequest {
-  email: string;
-  password: string;
+export interface UpdateAllBotCookieUrlRequest {
+  cookieUrl: string;
 }
 
-export interface UpdateAllBotCredentialsResponse {
+export interface UpdateAllBotCookieUrlResponse {
   /** số lượng bot đã được update */
   message: string;
 }
@@ -62,9 +128,13 @@ export interface BotResponse {
   bot: Bot | undefined;
 }
 
-export const BOT_PACKAGE_NAME = "bot";
+export const BOT_CRUD_PACKAGE_NAME = "bot_crud";
 
-export interface BotServiceClient {
+export interface BotCrudServiceClient {
+  detectFaces(request: FaceDetectRequest): Observable<FaceDetectResponse>;
+
+  searchFace(request: SearchFaceRequest): Observable<FaceSearchResponse>;
+
   createBot(request: CreateBotRequest): Observable<BotResponse>;
 
   updateBot(request: UpdateBotRequest): Observable<BotResponse>;
@@ -73,10 +143,24 @@ export interface BotServiceClient {
 
   getAllBots(request: GetAllBotsRequest): Observable<GetAllBotsResponse>;
 
-  updateAllBotCredentials(request: UpdateAllBotCredentialsRequest): Observable<UpdateAllBotCredentialsResponse>;
+  updateAllBotCredentials(request: UpdateAllBotCookieUrlRequest): Observable<UpdateAllBotCookieUrlResponse>;
+
+  checkUrlExists(request: CheckUrlRequest): Observable<CheckUrlResponse>;
+
+  /** 2. Lưu vector vào Elasticsearch và trả về ID */
+
+  saveVector(request: SaveVectorRequest): Observable<SaveVectorResponse>;
 }
 
-export interface BotServiceController {
+export interface BotCrudServiceController {
+  detectFaces(
+    request: FaceDetectRequest,
+  ): Promise<FaceDetectResponse> | Observable<FaceDetectResponse> | FaceDetectResponse;
+
+  searchFace(
+    request: SearchFaceRequest,
+  ): Promise<FaceSearchResponse> | Observable<FaceSearchResponse> | FaceSearchResponse;
+
   createBot(request: CreateBotRequest): Promise<BotResponse> | Observable<BotResponse> | BotResponse;
 
   updateBot(request: UpdateBotRequest): Promise<BotResponse> | Observable<BotResponse> | BotResponse;
@@ -88,26 +172,41 @@ export interface BotServiceController {
   ): Promise<GetAllBotsResponse> | Observable<GetAllBotsResponse> | GetAllBotsResponse;
 
   updateAllBotCredentials(
-    request: UpdateAllBotCredentialsRequest,
-  ):
-    | Promise<UpdateAllBotCredentialsResponse>
-    | Observable<UpdateAllBotCredentialsResponse>
-    | UpdateAllBotCredentialsResponse;
+    request: UpdateAllBotCookieUrlRequest,
+  ): Promise<UpdateAllBotCookieUrlResponse> | Observable<UpdateAllBotCookieUrlResponse> | UpdateAllBotCookieUrlResponse;
+
+  checkUrlExists(request: CheckUrlRequest): Promise<CheckUrlResponse> | Observable<CheckUrlResponse> | CheckUrlResponse;
+
+  /** 2. Lưu vector vào Elasticsearch và trả về ID */
+
+  saveVector(
+    request: SaveVectorRequest,
+  ): Promise<SaveVectorResponse> | Observable<SaveVectorResponse> | SaveVectorResponse;
 }
 
-export function BotServiceControllerMethods() {
+export function BotCrudServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createBot", "updateBot", "deleteBot", "getAllBots", "updateAllBotCredentials"];
+    const grpcMethods: string[] = [
+      "detectFaces",
+      "searchFace",
+      "createBot",
+      "updateBot",
+      "deleteBot",
+      "getAllBots",
+      "updateAllBotCredentials",
+      "checkUrlExists",
+      "saveVector",
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("BotService", method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod("BotCrudService", method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("BotService", method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod("BotCrudService", method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const BOT_SERVICE_NAME = "BotService";
+export const BOT_CRUD_SERVICE_NAME = "BotCrudService";

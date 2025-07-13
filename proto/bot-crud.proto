@@ -1,35 +1,104 @@
 syntax = "proto3";
 
-package bot;
+package bot_crud;
 
-service BotService {
+service BotCrudService {
+  rpc DetectFaces(FaceDetectRequest) returns (FaceDetectResponse);
+  rpc SearchFace (SearchFaceRequest) returns (FaceSearchResponse);
+
   rpc CreateBot (CreateBotRequest) returns (BotResponse);
   rpc UpdateBot (UpdateBotRequest) returns (BotResponse);
   rpc DeleteBot (DeleteBotRequest) returns (DeleteBotResponse);
   rpc GetAllBots (GetAllBotsRequest) returns (GetAllBotsResponse);
-  rpc UpdateAllBotCredentials (UpdateAllBotCredentialsRequest) returns (UpdateAllBotCredentialsResponse);
+  rpc UpdateAllBotCredentials (UpdateAllBotCookieUrlRequest) returns (UpdateAllBotCookieUrlResponse);
+
+  rpc CheckUrlExists(CheckUrlRequest) returns (CheckUrlResponse);
+
+  // 2. Lưu vector vào Elasticsearch và trả về ID
+  rpc SaveVector(SaveVectorRequest) returns (SaveVectorResponse);
+}
+message CheckUrlRequest {
+  string url = 1;
 }
 
+// Response cho CheckUrlExists
+message CheckUrlResponse {
+  bool exists = 1;
+}
+
+// Request cho SaveVector
+message SaveVectorRequest {
+  string url = 1;
+  string name = 2;
+  string picture = 3;
+  string headline = 4;
+  string location = 5;
+  string current_company = 6;
+  string education = 7;
+}
+
+// Response cho SaveVector
+message SaveVectorResponse {
+  string id = 1; // ID trong Elasticsearch
+}
+message FaceBox {
+  int32 x = 1;
+  int32 y = 2;
+  int32 width = 3;
+  int32 height = 4;
+  float confidence = 5;
+}
+
+// Request gửi vào để detect từ 1 ảnh URL
+message SearchFaceRequest {
+  string url = 1;
+}
+message FaceDetectRequest {
+  string url = 1;
+}
+message FaceSearchDocument {
+  string url = 1;
+  string name = 2;
+  string picture = 3;
+  string gender = 4;
+  string headline = 5;
+  string location = 6;
+  string current_company = 7;
+  string education = 8;
+  string created_at =9;
+
+}
+ 
+message FaceSearchResult {
+  FaceSearchDocument document = 1;
+  string similarity_score = 2; // e.g. "50.98 / 100"
+  float raw_score = 3;
+  float actual_cosine = 4;
+  string id = 5;
+}
+
+message FaceSearchResponse {
+  repeated FaceSearchResult results = 1;
+}
+message FaceDetectResponse {
+  string url = 1;
+  repeated FaceBox faces = 2;
+}
 message Bot {
-  string id = 1; // Mongo ObjectID (hoặc bot_id)
-  string bot_id = 2;
-  string error = 4;
-  string email = 5;
-  string password = 6;
+  string bot_id = 1;
+  string cookie_url = 2;
 }
 
 message CreateBotRequest {
   string bot_id = 1;
-  string email = 2;
-  string password = 3;
+  string cookie_url = 2;
 }
 
 message UpdateBotRequest {
-  string id = 1;
-  string email = 2;
-  string password = 3;
-  string status = 4;
-  string error = 5;
+  string bot_id = 1;
+  string cookie_url = 2;
+
+
 }
 
 message DeleteBotRequest {
@@ -46,12 +115,11 @@ message GetAllBotsResponse {
   repeated Bot bots = 1;
 }
 
-message UpdateAllBotCredentialsRequest {
-  string email = 1;
-  string password = 2;
+message UpdateAllBotCookieUrlRequest {
+  string cookie_url = 1;
 }
 
-message UpdateAllBotCredentialsResponse {
+message UpdateAllBotCookieUrlResponse {
   string message = 1; // số lượng bot đã được update
 }
 
