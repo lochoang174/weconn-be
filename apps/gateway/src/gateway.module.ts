@@ -21,6 +21,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { TestCrawlModule } from './test-crawl/test-crawl.module';
 import { GuestModule } from './guest/guest.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -48,7 +49,8 @@ import { GuestModule } from './guest/guest.module';
     UserModule,
     AuthModule,
     TestCrawlModule,
-    GuestModule
+    GuestModule,
+    PaymentModule,
     // SagaStepModule,
     // SagaInstanceModule,
 

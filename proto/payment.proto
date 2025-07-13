@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package payment;
+
+service PaymentService {
+    rpc Test(PaymentRequest) returns (PaymentResponse);
+
+}
+message PaymentRequest{
+    string userId =1;
+}
+message PaymentResponse{
+    bool response = 1;
+}

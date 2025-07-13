@@ -10,7 +10,7 @@
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "start:crawl": "nest start crawl --watch",
+    "start:payment": "nest start payment --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/weconn-be/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

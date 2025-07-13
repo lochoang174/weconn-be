@@ -38,9 +38,7 @@ export class ImageSearchService {
       this.clientGrpc.getService<BotCrudServiceClient>('BotCrudService');
   }
 
-  /**
-   * Core search functionality
-   */
+
   async handleSearch(url: string) {
     try {
       const request: SearchFaceRequest = { url };
@@ -122,9 +120,6 @@ export class ImageSearchService {
     }
   }
 
-  /**
-   * Private helper methods
-   */
   private async validateUserCredits(userId: string) {
     const userData = await this.userService.findById(userId);
 
