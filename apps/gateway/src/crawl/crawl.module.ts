@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { BOT_SERVICE_NAME } from 'proto/bot';
+import { SocketModule } from '../socket/socket.module';
 
 @Module({
   controllers: [CrawlController],
@@ -18,7 +19,7 @@ import { BOT_SERVICE_NAME } from 'proto/bot';
     // RmqModule.register({
     //   name: 'CRAWL',
     // }),
-
+    SocketModule,
     ClientsModule.register([
       {
         name: BOT_SERVICE_NAME,
