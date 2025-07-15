@@ -2,13 +2,125 @@ syntax = "proto3";
 
 package payment;
 
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+// Service Definition
 service PaymentService {
-    rpc Test(PaymentRequest) returns (PaymentResponse);
+  rpc Test(PaymentRequest) returns (PaymentResponse);
+  rpc GetAllSubscription(google.protobuf.Empty) returns (SubscriptionList);
+  rpc CreatePaymentLink(CreatePaymentLinkRequest) returns (CheckoutResponseDataType);
+  rpc GetPaymentLink(GetPaymentLinkRequest) returns (CheckoutResponseDataType);
+  rpc HandleWebhook(WebhookType) returns (WebhookDataType);
+  rpc GetPaymentById(GetPaymentByIdRequest) returns (PaymentResponse);
+}
+
+
+// Request and Response Messages
+message PaymentRequest {
+  string user_id = 1;
+}
+
+
+// Enum for subscription type
+enum SubscriptionType {
+  YEARLY = 0;
+  EACH = 1;
+  MONTHLY = 2;
+}
+
+// Subscription Data
+message Subscription {
+  string _id = 1;
+  int32 price = 2;
+  int32 credits = 3;
+  SubscriptionType type = 4;
+  int32 quantity = 5;
 
 }
-message PaymentRequest{
-    string userId =1;
+
+message CreatePaymentLinkRequest {
+  string userId = 1; // ✅ add this
+  string orderCode = 2;
+  int32 amount = 3;
+  string description = 4;
+  string returnUrl = 5;
+  string cancelUrl = 6;
+  string subscriptionId = 7;
+  int32 quantity = 8;
 }
-message PaymentResponse{
-    bool response = 1;
+
+
+// Wrapper for list of subscriptions
+message SubscriptionList {
+  repeated Subscription subscriptions = 1;
+}
+
+// Checkout Response Data Type
+message CheckoutResponseDataType {
+    string bin = 1;
+    string accountNumber = 2;
+    string accountName = 3;
+    int32 amount = 4;
+    string description = 5;
+    string orderCode = 6;
+    string paymentLinkId = 7;
+    string status = 8;
+    string checkoutUrl = 9;
+    string qrCode = 10;
+    SubscriptionType type = 11;
+}
+
+message GetPaymentLinkRequest {
+  string orderCode = 1;
+}
+
+
+message WebhookType {
+  string code = 1;
+  string desc = 2;
+  bool success = 3;
+  WebhookDataType data = 4;
+  string signature = 5;
+}
+
+message WebhookDataType {
+  string orderCode = 1;
+  int32 amount = 2;
+  string description = 3;
+  string accountNumber = 4;
+  string reference = 5;
+  string transactionDateTime = 6;
+  string currency = 7;
+  string paymentLinkId = 8;
+  string code = 9;
+  string desc = 10;
+
+  string counterAccountBankId = 11;
+  string counterAccountBankName = 12;
+  string counterAccountName = 13;
+  string counterAccountNumber = 14;
+  string virtualAccountName = 15;
+  string virtualAccountNumber = 16;
+}
+
+message GetPaymentByIdRequest {
+  string paymentId = 1;
+  string status = 2; // Optional, to filter by status
+}
+
+message PaymentResponse {
+  string _id = 1;                      // ✅ fixed
+  int32 orderId = 2;
+  int32 amount = 3;
+  string description = 4;
+  string status = 5;           // ✅ use enum type
+  string paymentLinkId = 6;
+  string userId = 7;
+  Subscription subscription = 8;
+}
+
+enum PaymentStatus {
+  PENDING = 0;
+  COMPLETED = 1;
+  FAILED = 2;
 }

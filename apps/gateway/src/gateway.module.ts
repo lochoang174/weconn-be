@@ -22,10 +22,11 @@ import { UserModule } from './user/user.module';
 import { TestCrawlModule } from './test-crawl/test-crawl.module';
 import { GuestModule } from './guest/guest.module';
 import { PaymentModule } from './payment/payment.module';
+import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.module';
 
 @Module({
   imports: [
-    // CrawlModule,
+    CrawlModule,
     // OrchestratorModule,
     BotModule,
     ConfigModule.forRoot({
@@ -38,7 +39,7 @@ import { PaymentModule } from './payment/payment.module';
     SocketModule,
     CacheModule.register({
       isGlobal: true,
-      ttl: 3600
+      ttl: 3600,
     }),
 
     ImageSearchModule,
@@ -51,12 +52,11 @@ import { PaymentModule } from './payment/payment.module';
     TestCrawlModule,
     GuestModule,
     PaymentModule,
+    SubcriptionModule,
     // SagaStepModule,
     // SagaInstanceModule,
-
-
   ],
   controllers: [GatewayController],
   providers: [GatewayService],
 })
-export class GatewayModule { }
+export class GatewayModule {}

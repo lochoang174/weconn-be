@@ -9,10 +9,11 @@ import { JwtAuthGuard } from './auth/guards/jwt.guard';
 async function bootstrap() {
   const app = await NestFactory.create(GatewayModule, {
     cors: {
-      origin: 'http://localhost:3001',
+      origin: '*',
       credentials: true,
     },
-  });  app.useGlobalPipes(new ValidationPipe());
+  });
+  app.useGlobalPipes(new ValidationPipe());
   // const rmqService = app.get<RmqService>(RmqService);
   // app.connectMicroservice<RmqOptions>(rmqService.getOptions('MAIN', false));
   const reflector = app.get(Reflector);

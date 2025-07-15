@@ -6,25 +6,21 @@ import { Public } from '../decorator/customize';
 
 @Controller('crawl')
 export class CrawlController {
-  constructor(private readonly crawlService: CrawlService) { }
+  constructor(private readonly crawlService: CrawlService) {}
 
-  @Post("start_bot")
+  @Post('start_bot')
+  @Public()
   async botProcessing(@Body() data: { id: string }) {
-
-    return this.crawlService.bot_processing(data.id)
+    return this.crawlService.bot_processing(data.id);
   }
-  @Post("stop_bot")
+  @Post('stop_bot')
+  @Public()
   async stopBot(@Body() data: { id: string }) {
-
-    return this.crawlService.stop_bot_processing(data.id)
+    return this.crawlService.stop_bot_processing(data.id);
   }
-  @Post("start_crawl_detail")
+  @Post('start_crawl_detail')
+  @Public()
   async botProcessingCrawlDetail(@Body() data: { id: string }) {
-
-    return this.crawlService.start_bot_detail_processing(data.id)
+    return this.crawlService.start_bot_detail_processing(data.id);
   }
-
-
-
-
 }

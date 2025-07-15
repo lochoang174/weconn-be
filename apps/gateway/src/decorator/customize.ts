@@ -6,7 +6,7 @@ import {
 import { Reflector } from '@nestjs/core';
 
 export const IS_PUBLIC_KEY = 'isPublic';
-export const MESSAGE_RESPONSE= "response_message"
+export const MESSAGE_RESPONSE = 'response_message';
 
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 export const User = createParamDecorator(
@@ -16,12 +16,12 @@ export const User = createParamDecorator(
   },
 );
 export const ResponseMessage = (message: string) =>
-      SetMetadata(MESSAGE_RESPONSE, message);
+  SetMetadata(MESSAGE_RESPONSE, message);
 export const Roles = Reflector.createDecorator<string[]>();
 export const CurrentUser = createParamDecorator(
   (data: string | undefined, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
-    
+
     // If data is provided, return specific field from user
     if (data) {
       return request.user?.[data];
