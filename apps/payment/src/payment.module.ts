@@ -6,6 +6,7 @@ import { join } from 'path';
 import { DatabaseModule } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Payment, PaymentSchema } from './payment.schema';
+import { SubcriptionModule } from './subcription/subcription.module';
 
 @Module({
   imports: [
@@ -16,10 +17,8 @@ import { Payment, PaymentSchema } from './payment.schema';
         DatabaseModule.forRoot({
           payment: 'PAYMENT_URI',
         }),
-        MongooseModule.forFeature(
-          [{ name: Payment.name, schema: PaymentSchema }],
-          'payment',
-        ),
+
+        SubcriptionModule,
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

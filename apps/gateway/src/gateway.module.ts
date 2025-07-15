@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { GatewayController } from './gateway.controller';
 import { GatewayService } from './gateway.service';
 import { CrawlModule } from './crawl/crawl.module';
-import { OrchestratorModule } from './orchestrator/orchestrator.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UploadModule } from './upload/upload.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
@@ -25,7 +24,7 @@ import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
-    // CrawlModule,
+    CrawlModule,
     // OrchestratorModule,
     BotModule,
     ConfigModule.forRoot({
