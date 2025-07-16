@@ -91,7 +91,7 @@ export class PaymentController {
 
       description,
       returnUrl: data.returnUrl || `${CLIENT_DOMAIN}/payment-success`,
-      cancelUrl: data.cancelUrl || `${CLIENT_DOMAIN}/pricing`,
+      cancelUrl: data.cancelUrl || `${CLIENT_DOMAIN}/payment-fail`,
     };
 
     try {

@@ -22,7 +22,7 @@ const googleProtoDir = path.dirname(
         options: {
           package: 'bot_crud',
           protoPath: join(__dirname, '../../../proto/bot-crud.proto'), // Đường dẫn đúng
-          url: '192.168.1.107:50052', // Quan trọng: Listen trên tất cả interfaces
+          url: '10.0.2.156:50052', // Quan trọng: Listen trên tất cả interfaces
         },
       },
     ]),
