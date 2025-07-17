@@ -103,7 +103,7 @@ export class CloudinaryService {
       const uploadedImageResult = await cloudinaryUploadPromise;
       const generatedUuid = uuidv4();
 
-    
+
       return {
         ...uploadedImageResult,
         userId: generatedUuid
@@ -113,103 +113,139 @@ export class CloudinaryService {
       throw error;
     }
   }
-async uploadJsonFile(
-  file: Express.Multer.File,
-  folder?: string,
-): Promise<CloudinaryUploadResult & { userId: string; viewUrl: string }> {
-  try {
-    // 1. Kiểm tra định dạng
-    if (file.mimetype !== 'application/json') {
-      throw new BadRequestException(
-        'Invalid file type. Only JSON files are allowed.',
-      );
-    }
-
-    const maxSize = 2 * 1024 * 1024; // Giới hạn 2MB
-    if (file.size > maxSize) {
-      throw new BadRequestException('File size too large. Maximum 2MB allowed.');
-    }
-
-    // 2. Cấu hình upload
-    const uploadOptions: any = {
-      resource_type: 'raw',
-      folder: folder || 'json-uploads',
-      use_filename: true,
-      unique_filename: false, // Giữ tên gốc
-      filename_override: file.originalname, // Đảm bảo giữ lại đuôi .json
-    };
-
-    // 3. Upload lên Cloudinary
-    const cloudinaryUploadPromise: Promise<CloudinaryUploadResult> = new Promise(
-      (resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          uploadOptions,
-          (error: UploadApiErrorResponse, result: UploadApiResponse) => {
-            if (error) {
-              this.logger.error('Cloudinary JSON upload error:', error);
-              reject(
-                new BadRequestException(`JSON Upload failed: ${error.message}`),
-              );
-            } else {
-              this.logger.log(`JSON uploaded successfully: ${result.public_id}`);
-              const uploadResult: CloudinaryUploadResult = {
-                public_id: result.public_id,
-                url: result.url,
-                secure_url: result.secure_url,
-                format: result.format,
-                width: result.width,
-                height: result.height,
-                bytes: result.bytes,
-                created_at: result.created_at,
-              };
-              resolve(uploadResult);
-            }
-          },
-        );
-
-        // Dùng streamifier để tạo stream từ buffer
-        streamifier.createReadStream(file.buffer).pipe(uploadStream);
-      },
-    );
-
-    const uploadedJsonResult = await cloudinaryUploadPromise;
-    const generatedUuid = uuidv4();
-
-    // 4. Tạo viewUrl để xem trực tiếp JSON (tránh tải về)
-    const viewUrl = uploadedJsonResult.secure_url.replace(
-      '/upload/',
-      '/upload/fl_attachment:false/'
-    );
-
-    // 5. Emit event nếu cần
+  async uploadJsonFile(
+    file: Express.Multer.File,
+    folder?: string,
+  ): Promise<CloudinaryUploadResult & { userId: string; viewUrl: string }> {
     try {
-      if (this.client) {
-        this.client.emit('json_uploaded', {
-          url: viewUrl,
-          downloadUrl: uploadedJsonResult.secure_url,
-          id: generatedUuid,
-          public_id: uploadedJsonResult.public_id,
-        });
-        this.logger.log(`Emitted "json_uploaded" event for URL: ${viewUrl}`);
-      } else {
-        this.logger.warn('ClientProxy not available. Cannot emit "json_uploaded" event.');
+      // 1. Kiểm tra định dạng
+      if (file.mimetype !== 'application/json') {
+        throw new BadRequestException(
+          'Invalid file type. Only JSON files are allowed.',
+        );
       }
-    } catch (emitError) {
-      this.logger.error('Error emitting "json_uploaded" event:', emitError);
+
+      const maxSize = 2 * 1024 * 1024; // Giới hạn 2MB
+      if (file.size > maxSize) {
+        throw new BadRequestException('File size too large. Maximum 2MB allowed.');
+      }
+
+      // 2. Cấu hình upload
+      const uploadOptions: any = {
+        resource_type: 'raw',
+        folder: folder || 'json-uploads',
+        use_filename: true,
+        unique_filename: false, // Giữ tên gốc
+        filename_override: file.originalname, // Đảm bảo giữ lại đuôi .json
+      };
+
+      // 3. Upload lên Cloudinary
+      const cloudinaryUploadPromise: Promise<CloudinaryUploadResult> = new Promise(
+        (resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            uploadOptions,
+            (error: UploadApiErrorResponse, result: UploadApiResponse) => {
+              if (error) {
+                this.logger.error('Cloudinary JSON upload error:', error);
+                reject(
+                  new BadRequestException(`JSON Upload failed: ${error.message}`),
+                );
+              } else {
+                this.logger.log(`JSON uploaded successfully: ${result.public_id}`);
+                const uploadResult: CloudinaryUploadResult = {
+                  public_id: result.public_id,
+                  url: result.url,
+                  secure_url: result.secure_url,
+                  format: result.format,
+                  width: result.width,
+                  height: result.height,
+                  bytes: result.bytes,
+                  created_at: result.created_at,
+                };
+                resolve(uploadResult);
+              }
+            },
+          );
+
+          // Dùng streamifier để tạo stream từ buffer
+          streamifier.createReadStream(file.buffer).pipe(uploadStream);
+        },
+      );
+
+      const uploadedJsonResult = await cloudinaryUploadPromise;
+      const generatedUuid = uuidv4();
+
+      // 4. Tạo viewUrl để xem trực tiếp JSON (tránh tải về)
+      const viewUrl = uploadedJsonResult.secure_url.replace(
+        '/upload/',
+        '/upload/fl_attachment:false/'
+      );
+
+      // 5. Emit event nếu cần
+      try {
+        if (this.client) {
+          this.client.emit('json_uploaded', {
+            url: viewUrl,
+            downloadUrl: uploadedJsonResult.secure_url,
+            id: generatedUuid,
+            public_id: uploadedJsonResult.public_id,
+          });
+          this.logger.log(`Emitted "json_uploaded" event for URL: ${viewUrl}`);
+        } else {
+          this.logger.warn('ClientProxy not available. Cannot emit "json_uploaded" event.');
+        }
+      } catch (emitError) {
+        this.logger.error('Error emitting "json_uploaded" event:', emitError);
+      }
+
+      // 6. Trả về kết quả
+      return {
+        ...uploadedJsonResult,
+        userId: generatedUuid,
+        viewUrl: viewUrl,
+      };
+    } catch (error) {
+      this.logger.error('Error in uploadJsonFile process:', error);
+      throw error;
+    }
+  }
+ async uploadImageFromUrl(
+  imageUrl: string,
+  folder?: string,
+): Promise<string> {
+  try {
+    if (!imageUrl) {
+      throw new BadRequestException('Image URL is required.');
     }
 
-    // 6. Trả về kết quả
-    return {
-      ...uploadedJsonResult,
-      userId: generatedUuid,
-      viewUrl: viewUrl,
+    const uploadOptions: any = {
+      resource_type: 'image',
+      folder: folder || 'uploads',
+      use_filename: true,
+      unique_filename: true,
+      
+      // Nén để giảm xuống ~50KB
+      quality: 'auto:low',        // Chất lượng thấp
+      format: 'jpg',              // Force JPG để nén tốt
+      width: 600,                 // Resize nhỏ hơn
+      height: 400,
+      crop: 'limit',              // Chỉ resize nếu ảnh lớn hơn
+      flags: 'lossy',             // Nén lossy
+      bytes: 51200,               // Giới hạn 50KB
+      progressive: true,          // JPEG progressive
+      strip: true,                // Xóa metadata
     };
+
+    const result = await cloudinary.uploader.upload(imageUrl, uploadOptions);
+
+    this.logger.log(`Image uploaded: ${result.secure_url}, Size: ${Math.round(result.bytes / 1024)}KB`);
+
+    return result.secure_url;
   } catch (error) {
-    this.logger.error('Error in uploadJsonFile process:', error);
+    this.logger.error('Error uploading image from URL:', error);
     throw error;
   }
 }
-
   /**
    * Upload multiple images to Cloudinary
    */

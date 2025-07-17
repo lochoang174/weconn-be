@@ -14,6 +14,10 @@ export class UploadService {
     onModuleInit() {
         this.botCrudService = this.clientGrpc.getService<BotCrudServiceClient>('BotCrudService');
     }
+    async uploadDataImage(imageUrl: string,folder:string){
+        let res = await this.cloudinaryService.uploadImageFromUrl(imageUrl,folder)
+        return res
+    }
     async uploadAndCropImage(file: Express.Multer.File, folder?: string,) {
         const saveImage = await this.cloudinaryService.uploadImage(file, folder)
         console.log(saveImage)

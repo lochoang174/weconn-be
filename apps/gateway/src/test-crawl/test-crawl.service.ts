@@ -29,9 +29,10 @@ export class TestCrawlService {
                     "company": payload.company,
                     "job_title": "",
                     "location": "VietNam",
-                    "keyword": "Backend Engineer OR Frontend Engineer OR Product Manager OR Designer ",
+                    "keyword": payload.keyword,
                     "page": payload.page
                 }),
+
             });
 
             if (!response.ok) {
@@ -134,8 +135,8 @@ export class TestCrawlService {
             let result;
             try {
                 result = this.transformLinkedInData(data);
-                    console.log(result)
- 
+                console.log(result)
+
                 const res = await firstValueFrom(this.botCrudService.saveVector(result))
                 console.log("New document was created has the id is: ")
                 console.log(res.id)
@@ -182,7 +183,7 @@ export class TestCrawlService {
 type TransformedLinkedInProfile = {
     url: string;
     name: string;
-    picture: string; 
+    picture: string;
     headline?: string;
     location?: string;
     current_company?: string;

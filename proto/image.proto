@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package Image;
+
+service ImageService {
+    rpc UploadToCloud(ImageRequest) returns (ImageResponse);
+
+}
+message ImageRequest{
+    string imageUrl =1;
+}
+message ImageResponse{
+    string imageUrl = 1;
+}

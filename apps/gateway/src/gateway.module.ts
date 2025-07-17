@@ -24,7 +24,7 @@ import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
-    CrawlModule,
+    // CrawlModule,
     // OrchestratorModule,
     BotModule,
     ConfigModule.forRoot({
