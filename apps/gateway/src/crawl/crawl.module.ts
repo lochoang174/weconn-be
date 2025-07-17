@@ -20,18 +20,17 @@ import { SocketModule } from '../socket/socket.module';
     //   name: 'CRAWL',
     // }),
     SocketModule,
-     ClientsModule.register([
+    ClientsModule.register([
       {
         name: BOT_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          package: "bot",
-          protoPath: join(__dirname, "../../../proto/bot.proto"), // Đường dẫn đúng
-          url: "localhost:50051", // Quan trọng: Listen trên tất cả interfaces
+          package: 'bot',
+          protoPath: join(__dirname, '../../../proto/bot.proto'), // Đường dẫn đúng
+          url: 'localhost:50051', // Quan trọng: Listen trên tất cả interfaces
         },
       },
-    ]), 
-  ], 
+    ]),
+  ],
 })
-export class CrawlModule {} 
-   
+export class CrawlModule {}

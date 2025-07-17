@@ -54,9 +54,13 @@ export class UserService {
     return await this.userRepository.findOne({ _id: id });
   }
   async updateCredits(id: string, credits: number): Promise<User> {
+    if (typeof credits !== 'number') {
+      throw new Error('Credits must be a number');
+    }
+
     return await this.userRepository.findOneAndUpdate(
       { _id: id },
-      { $inc: { credits: credits } },
+      { $inc: { credits } },
     );
   }
 }

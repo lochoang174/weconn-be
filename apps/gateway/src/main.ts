@@ -9,7 +9,7 @@ import { JwtAuthGuard } from './auth/guards/jwt.guard';
 async function bootstrap() {
   const app = await NestFactory.create(GatewayModule, {
     cors: {
-      origin: 'http://localhost:3001',
+      origin: '*',
       credentials: true,
     },
   });
