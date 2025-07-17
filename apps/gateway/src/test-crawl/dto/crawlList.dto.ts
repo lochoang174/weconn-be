@@ -8,6 +8,8 @@ export class CrawlListProfileDto {
 
     @IsString()
     company: string;
+        @IsString()
+    keyword: string;
     @IsNumber()
     page: number;
 

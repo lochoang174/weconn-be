@@ -12,6 +12,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService, CloudinaryUploadResult } from '../cloudinary/cloudinary.service';
 import { UploadService } from './upload.service';
 import { Public } from '../decorator/customize';
+import { GrpcMethod } from '@nestjs/microservices';
+import { ImageRequest, ImageResponse } from 'proto/image';
 
 export class UploadSingleDto {
   folder?: string;
@@ -33,13 +35,13 @@ export class UploadController {
   constructor(
     private readonly uploadService: UploadService,
     private readonly cloudinaryService: CloudinaryService) { }
- 
+
   @Post('image-search')
   @Public()
   @UseInterceptors(FileInterceptor('file'))
   async uploadSingle(
     @UploadedFile() file: Express.Multer.File,
-  ){
+  ) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
@@ -47,7 +49,7 @@ export class UploadController {
       const result = await this.uploadService.uploadAndCropImage(
         file,
         "guest",
- 
+
       );
 
       return result
@@ -56,7 +58,7 @@ export class UploadController {
     }
   }
 
-  
+
   @Post('cookie-json')
   @UseInterceptors(FileInterceptor('file'))
   async uploadCookieJson(
@@ -84,5 +86,10 @@ export class UploadController {
 
 
 
-
+  @GrpcMethod('ImageService', 'UploadToCloud')
+  async uploadImage(data: ImageRequest) {
+    // handle logic
+    let res = await this.uploadService.uploadDataImage(data.imageUrl, "data")
+    return { imageUrl: res }
+  }
 }

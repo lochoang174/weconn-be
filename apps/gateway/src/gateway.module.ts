@@ -25,7 +25,7 @@ import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.modu
 
 @Module({
   imports: [
-    CrawlModule,
+    // CrawlModule,
     // OrchestratorModule,
     BotModule,
     ConfigModule.forRoot({
