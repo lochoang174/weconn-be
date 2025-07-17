@@ -81,17 +81,17 @@ export class PaymentController {
     });
 
     const description = `${paymentDoc._id.toString()}`;
-
+    console.log('amount', data.amount, subcriptionInfo.price);
     const body = {
       orderCode,
       amount:
         subcriptionInfo.quantity !== undefined
           ? subcriptionInfo.price * subcriptionInfo.quantity
-          : subcriptionInfo.price,
+          : data.amount || subcriptionInfo.price,
 
       description,
       returnUrl: data.returnUrl || `${CLIENT_DOMAIN}/payment-success`,
-      cancelUrl: data.cancelUrl || `${CLIENT_DOMAIN}/payment-fail`,
+      cancelUrl: data.cancelUrl || `${CLIENT_DOMAIN}/pricing`,
     };
 
     try {
@@ -213,6 +213,40 @@ export class PaymentController {
       userId: payment.userId,
       subscription: subscription,
       createdAt: payment.createdAt.toISOString(),
+    };
+  }
+
+  @GrpcMethod('PaymentService', 'GetPaymentHistory')
+  async getPaymentHistory(data: { userId: string }) {
+    const paymentHistory = await this.paymentRepository.find({
+      userId: data.userId,
+      status: 'SUCCESS',
+    });
+    return {
+      payments: paymentHistory.map((payment) => {
+        const subscription: any = {
+          _id: payment.subcription._id.toString(),
+          price: payment.subcription.price,
+          credits: payment.subcription.credits,
+          type: payment.subcription.type,
+        };
+
+        if (payment.subcription.quantity !== undefined) {
+          subscription.quantity = payment.subcription.quantity;
+        }
+
+        return {
+          Id: payment._id.toString(),
+          orderId: payment.orderId,
+          amount: payment.amount,
+          description: payment.description,
+          status: payment.status,
+          paymentLinkId: payment.paymentLinkId,
+          userId: payment.userId,
+          createdAt: payment.createdAt.toISOString(),
+          subscription: subscription,
+        };
+      }),
     };
   }
 }

@@ -12,6 +12,7 @@ service PaymentService {
   rpc GetPaymentLink(GetPaymentLinkRequest) returns (CheckoutResponseDataType);
   rpc HandleWebhook(WebhookType) returns (WebhookDataType);
   rpc GetPaymentById(GetPaymentByIdRequest) returns (PaymentResponse);
+  rpc GetPaymentHistory(PaymentRequest) returns (GetPaymentHistoryResponse);
 }
 
 
@@ -116,7 +117,12 @@ message PaymentResponse {
   string status = 5;           // ✅ use enum type
   string paymentLinkId = 6;
   string userId = 7;
-  Subscription subscription = 8;
+  string createdAt = 8;
+  Subscription subscription = 9;
+}
+
+message GetPaymentHistoryResponse {
+  repeated PaymentResponse payments = 1;
 }
 
 enum PaymentStatus {

@@ -6,6 +6,7 @@ import {
   PAYMENT_SERVICE_NAME,
   PaymentRequest,
   PaymentServiceClient,
+  SubscriptionType,
 } from 'proto/payment';
 import { IUser } from '../types/IUser';
 import { firstValueFrom } from 'rxjs';
@@ -89,12 +90,27 @@ export class PaymentService implements OnModuleInit {
         fixedBody.data.description,
         'SUCCESS',
       );
-      console.log('Payment after webhook:', payment.subscription.quantity);
-      this.userService.updateCredits(
-        payment.userId,
-        payment.subscription.quantity ?? payment.subscription.credits,
-      );
+
+      if (payment.subscription.type === SubscriptionType.MONTHLY) {
+        this.userService.updateCredits(
+          payment.userId,
+          payment.subscription.credits,
+          SubscriptionType.MONTHLY,
+        );
+      } else {
+        this.userService.updateCredits(
+          payment.userId,
+          payment.subscription.quantity,
+        );
+      }
     }
+    return response;
+  }
+
+  async getPaymentHistory(id: string) {
+    const response = await firstValueFrom(
+      this.paymentServiceClient.getPaymentHistory({ userId: id }),
+    );
     return response;
   }
 }

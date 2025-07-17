@@ -1,15 +1,8 @@
-import { forwardRef, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import {
-  RoleEnum,
-  User,
-  UserDocument,
-  UserTypeEnum,
-} from './schema/user.schema';
+import { SubscriptionType } from 'proto/payment';
+import { RoleEnum, User } from './schema/user.schema';
 import { UserRepository } from './user.repository';
-import { IUser } from '../types/IUser';
 
 @Injectable()
 export class UserService {
@@ -38,7 +31,7 @@ export class UserService {
         email,
         role: RoleEnum.CLIENT,
         username: name,
-        type: UserTypeEnum.NORMAL,
+        type: SubscriptionType.EACH,
         credits: 10,
       });
     }
@@ -53,14 +46,24 @@ export class UserService {
   async findById(id: string): Promise<User> {
     return await this.userRepository.findOne({ _id: id });
   }
-  async updateCredits(id: string, credits: number): Promise<User> {
+  async updateCredits(
+    id: string,
+    credits: number,
+    type?: SubscriptionType,
+  ): Promise<User> {
     if (typeof credits !== 'number') {
       throw new Error('Credits must be a number');
     }
 
+    const updateObject: any = { $inc: { credits } };
+
+    if (type !== undefined) {
+      updateObject.type = type;
+    }
+
     return await this.userRepository.findOneAndUpdate(
       { _id: id },
-      { $inc: { credits } },
+      updateObject,
     );
   }
 }

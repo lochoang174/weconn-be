@@ -21,6 +21,11 @@ export class PaymentController {
     return this.paymentService.getAllSubscription();
   }
 
+  @Get('/history')
+  async getPaymentHistory(@CurrentUser() user: IUser) {
+    return this.paymentService.getPaymentHistory(user.id);
+  }
+
   @Get('/:paymentId')
   async getPaymentById(@Param('paymentId') paymentId: string) {
     return this.paymentService.getPaymentById(paymentId);
@@ -59,4 +64,6 @@ export class PaymentController {
       // throw new InternalServerErrorException('Webhook processing failed');
     }
   }
+
+  // get all payment history by user
 }

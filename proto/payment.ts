@@ -119,7 +119,12 @@ export interface PaymentResponse {
   status: string;
   paymentLinkId: string;
   userId: string;
+  createdAt: string;
   subscription: Subscription | undefined;
+}
+
+export interface GetPaymentHistoryResponse {
+  payments: PaymentResponse[];
 }
 
 export const PAYMENT_PACKAGE_NAME = "payment";
@@ -138,6 +143,8 @@ export interface PaymentServiceClient {
   handleWebhook(request: WebhookType): Observable<WebhookDataType>;
 
   getPaymentById(request: GetPaymentByIdRequest): Observable<PaymentResponse>;
+
+  getPaymentHistory(request: PaymentRequest): Observable<GetPaymentHistoryResponse>;
 }
 
 /** Service Definition */
@@ -160,6 +167,10 @@ export interface PaymentServiceController {
   getPaymentById(
     request: GetPaymentByIdRequest,
   ): Promise<PaymentResponse> | Observable<PaymentResponse> | PaymentResponse;
+
+  getPaymentHistory(
+    request: PaymentRequest,
+  ): Promise<GetPaymentHistoryResponse> | Observable<GetPaymentHistoryResponse> | GetPaymentHistoryResponse;
 }
 
 export function PaymentServiceControllerMethods() {
@@ -171,6 +182,7 @@ export function PaymentServiceControllerMethods() {
       "getPaymentLink",
       "handleWebhook",
       "getPaymentById",
+      "getPaymentHistory",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
