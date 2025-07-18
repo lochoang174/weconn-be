@@ -1,4 +1,4 @@
-import { UserTypeEnum } from '../user/schema/user.schema';
+import { SubscriptionType } from 'proto/payment';
 
 export interface IUser {
   id: string;
@@ -6,6 +6,6 @@ export interface IUser {
   email: string;
   username: string;
   avatar: string;
-  type: UserTypeEnum;
+  type: SubscriptionType;
   credits: number;
 }
