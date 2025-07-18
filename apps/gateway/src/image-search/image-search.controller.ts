@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Param, Post, Req, Res } from '@nestjs/common';
 import { ImageSearchService } from './image-search.service';
 import { CurrentUser, Public, Roles } from '../decorator/customize';
 import { IUser } from '../types/IUser';
@@ -29,6 +29,17 @@ export class ImageSearchController {
   @Post('/private')
   @Roles([RoleEnum.CLIENT])
   async privateHandleSearch(@Body() data: any, @CurrentUser() user: IUser) {
-    return await this.imageSearchService.handleSearchPrivate(data.url, user);
+    return await this.imageSearchService.handleSearchPrivate(data.url, user,data.historyDetailId);
   }
-}
+  @Get("/history")
+    @Roles([RoleEnum.CLIENT])
+  async gethistory(@CurrentUser() user: IUser){
+    return await this.imageSearchService.getHistory(user.id);
+  }
+  @Get("/history/:id")
+  @Roles([RoleEnum.CLIENT])
+  async gethistorydetail(@Param("id") id: string){
+    return await this.imageSearchService.getHistoryDetail(id);
+  } 
+} 
+ 

@@ -9,27 +9,40 @@ services:
       - ./apps/gateway/.env
     depends_on:
       - rabbitmq
+      - face-search
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
       - '3000:3000'
-  crawl:
+
+  payment:
     build:
       context: .
-      dockerfile: ./apps/crawl/Dockerfile
+      dockerfile: ./apps/payment/Dockerfile
       target: development
-    command: npm run start:crawl 
+    command: npm run start:payment 
     env_file:
-      - ./apps/crawl/.env
+      - ./apps/payment/.env
     depends_on:
       - rabbitmq
       - gateway
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-  rabbitmq:
-    image: rabbitmq:3-management # Dùng bản có giao diện quản lý sẽ hữu ích
+
+  face-search:
+    image: face-search
+    env_file:
+      - ./apps/face-search/.env
     ports:
-      - '5672:5672' # Cổng AMQP
-      - '15672:15672' # Cổng giao diện quản lý
+      - "50052:50052"
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'

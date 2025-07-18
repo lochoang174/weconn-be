@@ -3,8 +3,11 @@ syntax = "proto3";
 package bot_crud;
 
 service BotCrudService {
-  rpc DetectFaces(FaceDetectRequest) returns (FaceDetectResponse);
-  rpc SearchFace (SearchFaceRequest) returns (FaceSearchResponse);
+  rpc DetectFacesPublic(FaceDetectRequest) returns (FaceDetectResponse);
+  rpc DetectFacesPrivate(FaceDetectRequestPrivate) returns (FaceDetectPrivateResponse);
+
+  rpc SearchFacePublic(SearchFaceRequest) returns (FaceSearchResponse);
+  rpc SearchFacePrivate(SearchFacePrivateRequest) returns (FaceSearchPrivateResponse);
 
   rpc CreateBot (CreateBotRequest) returns (BotResponse);
   rpc UpdateBot (UpdateBotRequest) returns (BotResponse);
@@ -13,20 +16,20 @@ service BotCrudService {
   rpc UpdateAllBotCredentials (UpdateAllBotCookieUrlRequest) returns (UpdateAllBotCookieUrlResponse);
 
   rpc CheckUrlExists(CheckUrlRequest) returns (CheckUrlResponse);
-
-  // 2. Lưu vector vào Elasticsearch và trả về ID
   rpc SaveVector(SaveVectorRequest) returns (SaveVectorResponse);
+
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+  rpc GetDetailHistory(GetDetailHistoryRequest) returns (GetDetailHistoryResponse);
 }
+
 message CheckUrlRequest {
   string url = 1;
 }
 
-// Response cho CheckUrlExists
 message CheckUrlResponse {
   bool exists = 1;
 }
 
-// Request cho SaveVector
 message SaveVectorRequest {
   string url = 1;
   string name = 2;
@@ -37,10 +40,10 @@ message SaveVectorRequest {
   string education = 7;
 }
 
-// Response cho SaveVector
 message SaveVectorResponse {
-  string id = 1; // ID trong Elasticsearch
+  string id = 1;
 }
+
 message FaceBox {
   int32 x = 1;
   int32 y = 2;
@@ -49,29 +52,64 @@ message FaceBox {
   float confidence = 5;
 }
 
-// Request gửi vào để detect từ 1 ảnh URL
-message SearchFaceRequest {
-  string url = 1;
+message FaceBoxPrivate {
+  int32 x = 1;
+  int32 y = 2;
+  int32 width = 3;
+  int32 height = 4;
+  float confidence = 5;
+  string history_detail_id = 6;
 }
+
 message FaceDetectRequest {
   string url = 1;
 }
+message FaceDetectRequestPrivate {
+  string url = 1;
+  string userId = 2;
+}
+message FaceDetectResponse {
+  string url = 1;
+  repeated FaceBox faces = 2;
+}
+
+message FaceDetectPrivateResponse {
+  string url = 1;
+  string history_id = 2;
+  repeated FaceBoxPrivate faces = 3;
+}
+
+message SearchFaceRequest {
+  string url = 1;
+}
+
+message SearchFacePrivateRequest {
+  string url = 1;
+  string history_detail_id = 2;
+}
+
 message FaceSearchDocument {
   string url = 1;
   string name = 2;
   string picture = 3;
-  string gender = 4;
-  string headline = 5;
-  string location = 6;
-  string current_company = 7;
-  string education = 8;
-  string created_at =9;
-
+  string headline = 4;
+  string location = 5;
+  string current_company = 6;
+  string education = 7;
+  string created_at = 8;
 }
- 
+
 message FaceSearchResult {
   FaceSearchDocument document = 1;
-  string similarity_score = 2; // e.g. "50.98 / 100"
+  string similarity_score = 2;
+  float raw_score = 3;
+  float actual_cosine = 4;
+  string id = 5;
+}
+
+message FaceSearchPrivateResult {
+  FaceSearchDocument document = 1;
+  string similarity_score = 2;
   float raw_score = 3;
   float actual_cosine = 4;
   string id = 5;
@@ -80,10 +118,14 @@ message FaceSearchResult {
 message FaceSearchResponse {
   repeated FaceSearchResult results = 1;
 }
-message FaceDetectResponse {
-  string url = 1;
-  repeated FaceBox faces = 2;
+
+message FaceSearchPrivateResponse {
+  repeated FaceSearchPrivateResult results = 1;
+  string history_detail_id = 2;
+  int32 status = 3;
+  bool isExist = 4;
 }
+
 message Bot {
   string bot_id = 1;
   string cookie_url = 2;
@@ -97,8 +139,6 @@ message CreateBotRequest {
 message UpdateBotRequest {
   string bot_id = 1;
   string cookie_url = 2;
-
-
 }
 
 message DeleteBotRequest {
@@ -120,9 +160,38 @@ message UpdateAllBotCookieUrlRequest {
 }
 
 message UpdateAllBotCookieUrlResponse {
-  string message = 1; // số lượng bot đã được update
+  string message = 1;
 }
 
 message BotResponse {
   Bot bot = 1;
+}
+
+message GetHistoryRequest {
+  string userId = 1;
+}
+
+message HistoryItem {
+  string history_id = 1;
+  string original_image = 2;
+  string created_at = 3;
+}
+
+message GetHistoryResponse {
+  repeated HistoryItem histories = 1;
+}
+
+message GetDetailHistoryRequest {
+  string history_id = 1;
+}
+
+message GetDetailHistoryResponseElement {
+  repeated FaceSearchPrivateResult results = 1;
+  string history_detail_id = 2;
+  int32 status = 3;
+  FaceBoxPrivate faces = 4;
+}
+message GetDetailHistoryResponse {
+  repeated GetDetailHistoryResponseElement results = 1;
+  string url =2;
 }

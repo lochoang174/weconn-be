@@ -14,12 +14,10 @@ export interface CheckUrlRequest {
   url: string;
 }
 
-/** Response cho CheckUrlExists */
 export interface CheckUrlResponse {
   exists: boolean;
 }
 
-/** Request cho SaveVector */
 export interface SaveVectorRequest {
   url: string;
   name: string;
@@ -30,9 +28,7 @@ export interface SaveVectorRequest {
   education: string;
 }
 
-/** Response cho SaveVector */
 export interface SaveVectorResponse {
-  /** ID trong Elasticsearch */
   id: string;
 }
 
@@ -44,20 +40,48 @@ export interface FaceBox {
   confidence: number;
 }
 
-/** Request gửi vào để detect từ 1 ảnh URL */
-export interface SearchFaceRequest {
-  url: string;
+export interface FaceBoxPrivate {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  confidence: number;
+  historyDetailId: string;
 }
 
 export interface FaceDetectRequest {
   url: string;
 }
 
+export interface FaceDetectRequestPrivate {
+  url: string;
+  userId: string;
+}
+
+export interface FaceDetectResponse {
+  url: string;
+  faces: FaceBox[];
+}
+
+export interface FaceDetectPrivateResponse {
+  url: string;
+  historyId: string;
+  faces: FaceBoxPrivate[];
+}
+
+export interface SearchFaceRequest {
+  url: string;
+}
+
+export interface SearchFacePrivateRequest {
+  url: string;
+  historyDetailId: string;
+}
+
 export interface FaceSearchDocument {
   url: string;
   name: string;
   picture: string;
-  gender: string;
   headline: string;
   location: string;
   currentCompany: string;
@@ -66,10 +90,15 @@ export interface FaceSearchDocument {
 }
 
 export interface FaceSearchResult {
-  document:
-    | FaceSearchDocument
-    | undefined;
-  /** e.g. "50.98 / 100" */
+  document: FaceSearchDocument | undefined;
+  similarityScore: string;
+  rawScore: number;
+  actualCosine: number;
+  id: string;
+}
+
+export interface FaceSearchPrivateResult {
+  document: FaceSearchDocument | undefined;
   similarityScore: string;
   rawScore: number;
   actualCosine: number;
@@ -80,9 +109,11 @@ export interface FaceSearchResponse {
   results: FaceSearchResult[];
 }
 
-export interface FaceDetectResponse {
-  url: string;
-  faces: FaceBox[];
+export interface FaceSearchPrivateResponse {
+  results: FaceSearchPrivateResult[];
+  historyDetailId: string;
+  status: number;
+  isExist: boolean;
 }
 
 export interface Bot {
@@ -120,7 +151,6 @@ export interface UpdateAllBotCookieUrlRequest {
 }
 
 export interface UpdateAllBotCookieUrlResponse {
-  /** số lượng bot đã được update */
   message: string;
 }
 
@@ -128,12 +158,46 @@ export interface BotResponse {
   bot: Bot | undefined;
 }
 
+export interface GetHistoryRequest {
+  userId: string;
+}
+
+export interface HistoryItem {
+  historyId: string;
+  originalImage: string;
+  createdAt: string;
+}
+
+export interface GetHistoryResponse {
+  histories: HistoryItem[];
+}
+
+export interface GetDetailHistoryRequest {
+  historyId: string;
+}
+
+export interface GetDetailHistoryResponseElement {
+  results: FaceSearchPrivateResult[];
+  historyDetailId: string;
+  status: number;
+  faces: FaceBoxPrivate | undefined;
+}
+
+export interface GetDetailHistoryResponse {
+  results: GetDetailHistoryResponseElement[];
+  url: string;
+}
+
 export const BOT_CRUD_PACKAGE_NAME = "bot_crud";
 
 export interface BotCrudServiceClient {
-  detectFaces(request: FaceDetectRequest): Observable<FaceDetectResponse>;
+  detectFacesPublic(request: FaceDetectRequest): Observable<FaceDetectResponse>;
 
-  searchFace(request: SearchFaceRequest): Observable<FaceSearchResponse>;
+  detectFacesPrivate(request: FaceDetectRequestPrivate): Observable<FaceDetectPrivateResponse>;
+
+  searchFacePublic(request: SearchFaceRequest): Observable<FaceSearchResponse>;
+
+  searchFacePrivate(request: SearchFacePrivateRequest): Observable<FaceSearchPrivateResponse>;
 
   createBot(request: CreateBotRequest): Observable<BotResponse>;
 
@@ -147,19 +211,29 @@ export interface BotCrudServiceClient {
 
   checkUrlExists(request: CheckUrlRequest): Observable<CheckUrlResponse>;
 
-  /** 2. Lưu vector vào Elasticsearch và trả về ID */
-
   saveVector(request: SaveVectorRequest): Observable<SaveVectorResponse>;
+
+  getHistory(request: GetHistoryRequest): Observable<GetHistoryResponse>;
+
+  getDetailHistory(request: GetDetailHistoryRequest): Observable<GetDetailHistoryResponse>;
 }
 
 export interface BotCrudServiceController {
-  detectFaces(
+  detectFacesPublic(
     request: FaceDetectRequest,
   ): Promise<FaceDetectResponse> | Observable<FaceDetectResponse> | FaceDetectResponse;
 
-  searchFace(
+  detectFacesPrivate(
+    request: FaceDetectRequestPrivate,
+  ): Promise<FaceDetectPrivateResponse> | Observable<FaceDetectPrivateResponse> | FaceDetectPrivateResponse;
+
+  searchFacePublic(
     request: SearchFaceRequest,
   ): Promise<FaceSearchResponse> | Observable<FaceSearchResponse> | FaceSearchResponse;
+
+  searchFacePrivate(
+    request: SearchFacePrivateRequest,
+  ): Promise<FaceSearchPrivateResponse> | Observable<FaceSearchPrivateResponse> | FaceSearchPrivateResponse;
 
   createBot(request: CreateBotRequest): Promise<BotResponse> | Observable<BotResponse> | BotResponse;
 
@@ -177,18 +251,26 @@ export interface BotCrudServiceController {
 
   checkUrlExists(request: CheckUrlRequest): Promise<CheckUrlResponse> | Observable<CheckUrlResponse> | CheckUrlResponse;
 
-  /** 2. Lưu vector vào Elasticsearch và trả về ID */
-
   saveVector(
     request: SaveVectorRequest,
   ): Promise<SaveVectorResponse> | Observable<SaveVectorResponse> | SaveVectorResponse;
+
+  getHistory(
+    request: GetHistoryRequest,
+  ): Promise<GetHistoryResponse> | Observable<GetHistoryResponse> | GetHistoryResponse;
+
+  getDetailHistory(
+    request: GetDetailHistoryRequest,
+  ): Promise<GetDetailHistoryResponse> | Observable<GetDetailHistoryResponse> | GetDetailHistoryResponse;
 }
 
 export function BotCrudServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      "detectFaces",
-      "searchFace",
+      "detectFacesPublic",
+      "detectFacesPrivate",
+      "searchFacePublic",
+      "searchFacePrivate",
       "createBot",
       "updateBot",
       "deleteBot",
@@ -196,6 +278,8 @@ export function BotCrudServiceControllerMethods() {
       "updateAllBotCredentials",
       "checkUrlExists",
       "saveVector",
+      "getHistory",
+      "getDetailHistory",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

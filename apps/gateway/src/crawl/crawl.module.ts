@@ -7,6 +7,7 @@ import { join } from 'path';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { BOT_SERVICE_NAME } from 'proto/bot';
 import { SocketModule } from '../socket/socket.module';
+import { GrpcClientModule } from '../grpc-client/grpc-client.module';
 
 @Module({
   controllers: [CrawlController],
@@ -19,18 +20,9 @@ import { SocketModule } from '../socket/socket.module';
     // RmqModule.register({
     //   name: 'CRAWL',
     // }),
+    GrpcClientModule,
     SocketModule,
-     ClientsModule.register([
-      {
-        name: BOT_SERVICE_NAME,
-        transport: Transport.GRPC,
-        options: {
-          package: "bot",
-          protoPath: join(__dirname, "../../../proto/bot.proto"), // Đường dẫn đúng
-          url: "localhost:50051", // Quan trọng: Listen trên tất cả interfaces
-        },
-      },
-    ]), 
+     
   ], 
 })
 export class CrawlModule {} 
