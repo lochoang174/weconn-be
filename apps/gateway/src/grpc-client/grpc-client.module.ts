@@ -10,11 +10,23 @@ import * as path from 'path';
 const googleProtoDir = path.dirname(
   protoPath.getProtoPath('google/protobuf/empty.proto'),
 );
+import { BOT_SERVICE_NAME } from 'proto/bot';
 
 @Module({
   controllers: [],
   providers: [GrpcClientService],
   imports: [
+     ClientsModule.register([
+      {
+        name: BOT_SERVICE_NAME,
+        transport: Transport.GRPC,
+        options: {
+          package: "bot",
+          protoPath: join(__dirname, "../../../proto/bot.proto"), // Đường dẫn đúng
+          url: "localhost:50051", // Quan trọng: Listen trên tất cả interfaces
+        },
+      },
+    ]),
     ClientsModule.register([
       {
         name: BOT_CRUD_SERVICE_NAME,

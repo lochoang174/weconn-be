@@ -4,12 +4,11 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-# Thêm --legacy-peer-deps vào đây
 RUN npm install --legacy-peer-deps
 
 COPY . .
 
-RUN npm run build crawl
+RUN npm run build gateway
 
 FROM node:alpine as production
 
@@ -20,11 +19,10 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-# Thêm --legacy-peer-deps ở production nếu cần
 RUN npm install --only=production --legacy-peer-deps
 
 COPY . .
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/apps/crawl/main"]
+CMD ["node", "dist/apps/payment/main"]

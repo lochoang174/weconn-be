@@ -11,9 +11,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService, CloudinaryUploadResult } from '../cloudinary/cloudinary.service';
 import { UploadService } from './upload.service';
-import { Public } from '../decorator/customize';
 import { GrpcMethod } from '@nestjs/microservices';
 import { ImageRequest, ImageResponse } from 'proto/image';
+import { CurrentUser, Public } from '../decorator/customize';
+import { IUser } from '../types/IUser';
 
 export class UploadSingleDto {
   folder?: string;
@@ -41,18 +42,39 @@ export class UploadController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadSingle(
     @UploadedFile() file: Express.Multer.File,
+    @Body() data: any
   ) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
+
     try {
-      const result = await this.uploadService.uploadAndCropImage(
-        file,
-        "guest",
 
-      );
 
-      return result
+    
+        return await this.uploadService.uploadAndCropImage(file, "guest");
+     
+    } catch (error) {
+      throw new BadRequestException(`Upload failed: ${error.message}`);
+    }
+  }
+@Post('image-search/private')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadSinglePrivate(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() data: any,
+    @CurrentUser() user: IUser
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    try {
+      // Ép kiểu isPrivate về boolean
+
+
+      return await this.uploadService.uploadAndCropImagePrivate(file,user.id,"user");
+     
     } catch (error) {
       throw new BadRequestException(`Upload failed: ${error.message}`);
     }

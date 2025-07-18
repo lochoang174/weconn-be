@@ -23,6 +23,7 @@ export interface FaceCoordinates {
   y: number;
   width: number;
   height: number;
+    historyDetailId?: string
 }
 
 
@@ -393,8 +394,9 @@ export class CloudinaryService {
   }
   getCroppedFaceUrls(
     originalImageUrl: string, // URL đầy đủ của ảnh gốc
-    faces: FaceCoordinates[]
-  ): string[] {
+    faces: FaceCoordinates[],
+
+  ): any[] {
     let publicIdToUse: string | null = this.extractPublicIdFromUrl(originalImageUrl); // Khai báo biến ở đây
     console.log("publicIdToUse: " + faces)
 
@@ -408,7 +410,7 @@ export class CloudinaryService {
     }
     this.logger.log(`Generating cropped URLs for public_id: ${publicIdToUse}`);
 
-    const croppedImageUrls: string[] = [];
+    const croppedImageUrls: any[] = [];
     for (const face of faces) {
       if (face.width <= 0 || face.height <= 0) {
         this.logger.warn(`Skipping face with invalid dimensions: w=${face.width}, h=${face.height}`);
@@ -424,8 +426,14 @@ export class CloudinaryService {
 
       try {
         // Sử dụng getOptimizedUrl đã có để tạo URL
-        const croppedUrl = this.getOptimizedUrl(publicIdToUse, cropOptions);
+        const croppedUrl = {
+          url: this.getOptimizedUrl(publicIdToUse, cropOptions),
+          ...(face.historyDetailId && { history_detail_id: face.historyDetailId  })
+        }
+
+
         croppedImageUrls.push(croppedUrl);
+
         this.logger.log(`Generated cropped URL for face (x:${face.x}, y:${face.y}, w:${face.width}, h:${face.height}): ${croppedUrl}`);
       } catch (error) {
         // getOptimizedUrl đã log lỗi và throw BadRequestException

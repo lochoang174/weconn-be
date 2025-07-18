@@ -34,7 +34,7 @@ import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.modu
     }),
 
     UploadModule,
-    CloudinaryModule,
+    CloudinaryModule, 
     SocketModule,
     CacheModule.register({
       isGlobal: true,

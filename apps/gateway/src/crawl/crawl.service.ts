@@ -18,9 +18,9 @@ export class CrawlService implements OnModuleInit {
   @Inject(BOT_SERVICE_NAME)
   private clientGrpc: ClientGrpc;
   constructor(    private readonly socketService: SocketService,
-  ){
-
-  }
+  ){   
+  
+  }        
   onModuleInit() {
     this.botService = this.clientGrpc.getService<BotServiceClient>(BOT_SERVICE_NAME);
 

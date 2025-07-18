@@ -5,6 +5,7 @@ import { RmqModule } from '@app/common';
 import { GrpcClientModule } from '../grpc-client/grpc-client.module';
 import { UserModule } from '../user/user.module';
 import { GuestModule } from '../guest/guest.module';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
 @Module({
   controllers: [ImageSearchController,
@@ -14,7 +15,8 @@ import { GuestModule } from '../guest/guest.module';
   }),
 GrpcClientModule,
 UserModule,
-GuestModule
+GuestModule,
+CloudinaryModule
 ],
   providers: [ImageSearchService],
 })
