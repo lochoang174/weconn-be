@@ -8,7 +8,7 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
-RUN npm run build gateway
+RUN npm run build payment
 
 FROM node:alpine as production
 

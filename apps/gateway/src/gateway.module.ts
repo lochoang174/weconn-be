@@ -25,7 +25,7 @@ import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.modu
 
 @Module({
   imports: [
-    // CrawlModule,
+    CrawlModule,
     // OrchestratorModule,
     BotModule,
     ConfigModule.forRoot({
@@ -33,7 +33,7 @@ import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.modu
       envFilePath: join(__dirname, '../../../apps/gateway/.env'),
     }),
 
-    UploadModule,
+    UploadModule, 
     CloudinaryModule, 
     SocketModule,
     CacheModule.register({

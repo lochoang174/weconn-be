@@ -5,6 +5,8 @@ services:
       dockerfile: ./apps/gateway/Dockerfile
       target: development
     command: npm run start:dev
+    extra_hosts:
+       - "host.docker.internal:host-gateway"
     env_file:
       - ./apps/gateway/.env
     depends_on:
@@ -15,7 +17,7 @@ services:
       - /usr/src/app/node_modules
     ports:
       - '3000:3000'
-
+ 
   payment:
     build:
       context: .
