@@ -36,36 +36,33 @@ export class ImageSearchService {
     private readonly userService: UserService,
     private readonly guestRepository: GuestRepository,
     private readonly cloudinaryService: CloudinaryService,
-  ) { }
+  ) {}
 
   onModuleInit() {
     this.botCrudService =
       this.clientGrpc.getService<BotCrudServiceClient>('BotCrudService');
   }
 
-
-  async handleSearch(url: string, isPrivate: boolean, historyDetailId:string) {
+  async handleSearch(url: string, isPrivate: boolean, historyDetailId: string) {
     try {
-      let request: SearchFacePrivateRequest | SearchFaceRequest = null
+      let request: SearchFacePrivateRequest | SearchFaceRequest = null;
       let response;
 
       if (isPrivate) {
         request = {
-          historyDetailId:historyDetailId,
-          url
-        }
-        console.log(request)
+          historyDetailId: historyDetailId,
+          url,
+        };
+        console.log(request);
         response = await firstValueFrom(
           this.botCrudService.searchFacePrivate(request),
         );
-      }
-      else {
+      } else {
         request = { url };
         response = await firstValueFrom(
           this.botCrudService.searchFacePublic(request),
         );
       }
-
 
       this.logger.debug('Search completed successfully', response);
       return response;
@@ -78,16 +75,16 @@ export class ImageSearchService {
       throw new InternalServerErrorException('Search service unavailable');
     }
   }
-  
+
   /**
    * Handle search for authenticated users
    */
-  async handleSearchPrivate(url: string, user: IUser,historyDetailId:string) {
+  async handleSearchPrivate(url: string, user: IUser, historyDetailId: string) {
     const userData = await this.validateUserCredits(user.id);
 
     try {
-      const result = await this.handleSearch(url,true,historyDetailId);
-      if(result.isExist){
+      const result = await this.handleSearch(url, true, historyDetailId);
+      if (result.isExist) {
         return {
           credits: userData.credits,
           ...result,
@@ -126,7 +123,7 @@ export class ImageSearchService {
       const guest = await this.findOrCreateGuest(userAgent, ip);
       this.validateGuestCredits(guest);
 
-      const result = await this.handleSearch(url,false,"");
+      const result = await this.handleSearch(url, false, '');
       const updatedGuest = await this.guestRepository.updateCredits(
         guest.guestId,
         -1,
@@ -193,49 +190,51 @@ export class ImageSearchService {
     throw new BadRequestException('Cannot search image for guest');
   }
   async getHistory(userId: string) {
-    let request:GetHistoryRequest ={
-      userId:userId
-    } 
+    let request: GetHistoryRequest = {
+      userId: userId,
+    };
 
     const response = await firstValueFrom(
       this.botCrudService.getHistory(request),
-    );  
+    );
     return response;
   }
   async getHistoryDetail(historyId: string) {
-    let request:GetDetailHistoryRequest ={
-      historyId:historyId
-    } 
+    let request: GetDetailHistoryRequest = {
+      historyId: historyId,
+    };
     const response = await firstValueFrom(
       this.botCrudService.getDetailHistory(request),
-    );  
-    
+    );
+
     // Process each result to get cropped face URLs
     const processedResults = [];
     for (const result of response.results) {
       if (result.faces) {
         // Get cropped face URLs for this result
         const croppedFaceUrls = this.cloudinaryService.getCroppedFaceUrls(
-          response.url, 
-          [result.faces]
+          response.url,
+          [result.faces],
         );
-        
+
         // Map to simplified structure with only historyDetailId, url, history_detail_id, and results
         if (croppedFaceUrls.length > 0) {
           const processedResult = {
             historyDetailId: result.historyDetailId,
             url: croppedFaceUrls[0].url,
-            history_detail_id: croppedFaceUrls[0].history_detail_id || result.faces.historyDetailId,
-            results: result.results
+            history_detail_id:
+              croppedFaceUrls[0].history_detail_id ||
+              result.faces.historyDetailId,
+            results: result.results,
           };
-          
+
           processedResults.push(processedResult);
         }
       }
     }
 
     return {
-      results: processedResults
+      results: processedResults,
     };
   }
 }
