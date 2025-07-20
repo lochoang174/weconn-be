@@ -48,7 +48,7 @@ export class PaymentController {
   async createPaymentLink(
     data: CreatePaymentLinkRequest,
   ): Promise<CheckoutResponseDataType> {
-    const CLIENT_DOMAIN = 'https://weconn-fe.tdung.com';
+    const CLIENT_DOMAIN = 'https://weconn-fe.vercel.app';
     const subcription = await this.subcriptionRepository.findOne({
       _id: new Types.ObjectId(data.subscriptionId),
     });
