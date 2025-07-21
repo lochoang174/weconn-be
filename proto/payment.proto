@@ -13,6 +13,7 @@ service PaymentService {
   rpc HandleWebhook(WebhookType) returns (WebhookDataType);
   rpc GetPaymentById(GetPaymentByIdRequest) returns (PaymentResponse);
   rpc GetPaymentHistory(PaymentRequest) returns (GetPaymentHistoryResponse);
+  rpc GetPaymentHistories(google.protobuf.Empty) returns (GetPaymentHistoryResponse);
 }
 
 

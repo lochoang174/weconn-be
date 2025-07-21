@@ -113,4 +113,11 @@ export class PaymentService implements OnModuleInit {
     );
     return response;
   }
+
+  async getPaymentHistories(id: string) {
+    const response = await firstValueFrom(
+      this.paymentServiceClient.getPaymentHistories({ userId: id }),
+    );
+    return response;
+  }
 }

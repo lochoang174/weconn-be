@@ -26,6 +26,11 @@ export class PaymentController {
     return this.paymentService.getPaymentHistory(user.id);
   }
 
+  @Get('/histories')
+  async getPaymentHistories(@CurrentUser() user: IUser) {
+    return this.paymentService.getPaymentHistories(user.id);
+  }
+
   @Get('/:paymentId')
   async getPaymentById(@Param('paymentId') paymentId: string) {
     return this.paymentService.getPaymentById(paymentId);

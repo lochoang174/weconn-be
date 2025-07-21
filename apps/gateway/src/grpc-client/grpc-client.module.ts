@@ -16,7 +16,7 @@ import { BOT_SERVICE_NAME } from 'proto/bot';
   controllers: [],
   providers: [GrpcClientService],
   imports: [
-     ClientsModule.register([
+    ClientsModule.register([
       {
         name: BOT_SERVICE_NAME,
         transport: Transport.GRPC,
@@ -34,7 +34,7 @@ import { BOT_SERVICE_NAME } from 'proto/bot';
         options: {
           package: 'bot_crud',
           protoPath: join(__dirname, '../../../proto/bot-crud.proto'), // Đường dẫn đúng
-          url: 'localhost:50052', // Quan trọng: Listen trên tất cả interfaces
+          url: 'face-search:50052', // Quan trọng: Listen trên tất cả interfaces
         },
       },
     ]),  
@@ -45,7 +45,7 @@ import { BOT_SERVICE_NAME } from 'proto/bot';
         options: {
           package: 'payment',
           protoPath: join(__dirname, '../../../proto/payment.proto'), // Đường dẫn đúng
-          url: 'localhost:50053',
+          url: 'payment:50053',
           loader: {
             includeDirs: [
               join(__dirname, '../../../proto'),

@@ -249,4 +249,35 @@ export class PaymentController {
       }),
     };
   }
+
+  @GrpcMethod('PaymentService', 'GetPaymentHistories')
+  async getPaymentHistories() {
+    const paymentHistories = await this.paymentRepository.find({});
+    return {
+      payments: paymentHistories.map((payment) => {
+        const subscription: any = {
+          _id: payment.subcription._id.toString(),
+          price: payment.subcription.price,
+          credits: payment.subcription.credits,
+          type: payment.subcription.type,
+        };
+
+        if (payment.subcription.quantity !== undefined) {
+          subscription.quantity = payment.subcription.quantity;
+        }
+
+        return {
+          Id: payment._id.toString(),
+          orderId: payment.orderId,
+          amount: payment.amount,
+          description: payment.description,
+          status: payment.status,
+          paymentLinkId: payment.paymentLinkId,
+          userId: payment.userId,
+          createdAt: payment.createdAt.toISOString(),
+          subscription: subscription,
+        };
+      }),
+    };
+  }
 }
