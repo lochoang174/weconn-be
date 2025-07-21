@@ -1,0 +1,6 @@
+[submodule "apps/bot_crawl"]
+	path = apps/bot_crawl
+	url = https://github.com/lochoang174/bot_crawl.git
+[submodule "apps/face_search"]
+	path = apps/face_search
+	url = https://github.com/lochoang174/face-search.git

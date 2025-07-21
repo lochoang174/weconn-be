@@ -11,7 +11,7 @@ services:
       - ./apps/gateway/.env
     depends_on:
       - rabbitmq
-      - face-search
+      - face_search
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -33,16 +33,23 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
 
-  face-search:
-    image: face-search
+  face_search:
+    build:
+      context: ./apps/face_search
+      dockerfile: Dockerfile
     env_file:
-      - ./apps/face-search/.env
+      - ./apps/face_search/.env
     ports:
       - "50052:50052"
     depends_on:
       - rabbitmq
     restart: unless-stopped
-
+  bot_crawl:
+    build:
+      context: ./apps/bot_crawl
+      dockerfile: Dockerfile
+    env_file:
+      - ./apps/bot_crawl/.env
   rabbitmq:
     image: rabbitmq:3-management
     ports:
