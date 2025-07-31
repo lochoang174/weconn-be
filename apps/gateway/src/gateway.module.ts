@@ -25,7 +25,7 @@ import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.modu
 
 @Module({
   imports: [
-    CrawlModule,
+    // CrawlModule,
     // OrchestratorModule,
     BotModule,
     ConfigModule.forRoot({
@@ -43,9 +43,10 @@ import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.modu
 
     ImageSearchModule,
     GrpcClientModule,
-    DatabaseModule.forRoot({
-      user: 'USER_URI',
-    }),
+      DatabaseModule.forRoot({
+        user: 'USER_URI',
+        crawl: 'CRAWL_URI',
+      }),
     UserModule,
     AuthModule,
     TestCrawlModule,

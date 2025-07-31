@@ -34,7 +34,7 @@ import { BOT_SERVICE_NAME } from 'proto/bot';
         options: {
           package: 'bot_crud',
           protoPath: join(__dirname, '../../../proto/bot-crud.proto'), // Đường dẫn đúng
-          url: 'face-search:50052', // Quan trọng: Listen trên tất cả interfaces
+          url: 'localhost:50052', // Quan trọng: Listen trên tất cả interfaces
         },
       },
     ]),  
