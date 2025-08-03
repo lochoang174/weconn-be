@@ -21,9 +21,9 @@ import { BOT_SERVICE_NAME } from 'proto/bot';
         name: BOT_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          package: "bot",
-          protoPath: join(__dirname, "../../../proto/bot.proto"), // Đường dẫn đúng
-          url: "host.docker.internal:50051", // Quan trọng: Listen trên tất cả interfaces
+          package: 'bot',
+          protoPath: join(__dirname, '../../../proto/bot.proto'), // Đường dẫn đúng
+          url: 'host.docker.internal:50051', // Quan trọng: Listen trên tất cả interfaces
         },
       },
     ]),
@@ -37,15 +37,15 @@ import { BOT_SERVICE_NAME } from 'proto/bot';
           url: 'face-search:50052', // Quan trọng: Listen trên tất cả interfaces
         },
       },
-    ]),  
+    ]),
     ClientsModule.register([
-      {   
+      {
         name: PAYMENT_PACKAGE_NAME,
-        transport: Transport.GRPC, 
+        transport: Transport.GRPC,
         options: {
           package: 'payment',
           protoPath: join(__dirname, '../../../proto/payment.proto'), // Đường dẫn đúng
-          url: 'payment:50053',
+          url: 'localhost:50053',
           loader: {
             includeDirs: [
               join(__dirname, '../../../proto'),

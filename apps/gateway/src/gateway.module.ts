@@ -33,8 +33,8 @@ import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.modu
       envFilePath: join(__dirname, '../../../apps/gateway/.env'),
     }),
 
-    UploadModule, 
-    CloudinaryModule, 
+    UploadModule,
+    CloudinaryModule,
     SocketModule,
     CacheModule.register({
       isGlobal: true,
@@ -52,6 +52,7 @@ import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.modu
     GuestModule,
     PaymentModule,
     SubcriptionModule,
+
     // SagaStepModule,
     // SagaInstanceModule,
   ],

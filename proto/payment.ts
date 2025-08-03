@@ -5,11 +5,11 @@
 // source: proto/payment.proto
 
 /* eslint-disable */
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
-import { Empty } from "../google/protobuf/empty";
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
+import { Empty } from '../google/protobuf/empty';
 
-export const protobufPackage = "payment";
+export const protobufPackage = 'payment';
 
 /** Enum for subscription type */
 export enum SubscriptionType {
@@ -33,7 +33,7 @@ export interface PaymentRequest {
 
 /** Subscription Data */
 export interface Subscription {
-  Id: string;
+  _id: string;
   price: number;
   credits: number;
   type: SubscriptionType;
@@ -127,7 +127,7 @@ export interface GetPaymentHistoryResponse {
   payments: PaymentResponse[];
 }
 
-export const PAYMENT_PACKAGE_NAME = "payment";
+export const PAYMENT_PACKAGE_NAME = 'payment';
 
 /** Service Definition */
 
@@ -136,15 +136,21 @@ export interface PaymentServiceClient {
 
   getAllSubscription(request: Empty): Observable<SubscriptionList>;
 
-  createPaymentLink(request: CreatePaymentLinkRequest): Observable<CheckoutResponseDataType>;
+  createPaymentLink(
+    request: CreatePaymentLinkRequest,
+  ): Observable<CheckoutResponseDataType>;
 
-  getPaymentLink(request: GetPaymentLinkRequest): Observable<CheckoutResponseDataType>;
+  getPaymentLink(
+    request: GetPaymentLinkRequest,
+  ): Observable<CheckoutResponseDataType>;
 
   handleWebhook(request: WebhookType): Observable<WebhookDataType>;
 
   getPaymentById(request: GetPaymentByIdRequest): Observable<PaymentResponse>;
 
-  getPaymentHistory(request: PaymentRequest): Observable<GetPaymentHistoryResponse>;
+  getPaymentHistory(
+    request: PaymentRequest,
+  ): Observable<GetPaymentHistoryResponse>;
 
   getPaymentHistories(request: Empty): Observable<GetPaymentHistoryResponse>;
 }
@@ -152,19 +158,34 @@ export interface PaymentServiceClient {
 /** Service Definition */
 
 export interface PaymentServiceController {
-  test(request: PaymentRequest): Promise<PaymentResponse> | Observable<PaymentResponse> | PaymentResponse;
+  test(
+    request: PaymentRequest,
+  ): Promise<PaymentResponse> | Observable<PaymentResponse> | PaymentResponse;
 
-  getAllSubscription(request: Empty): Promise<SubscriptionList> | Observable<SubscriptionList> | SubscriptionList;
+  getAllSubscription(
+    request: Empty,
+  ):
+    | Promise<SubscriptionList>
+    | Observable<SubscriptionList>
+    | SubscriptionList;
 
   createPaymentLink(
     request: CreatePaymentLinkRequest,
-  ): Promise<CheckoutResponseDataType> | Observable<CheckoutResponseDataType> | CheckoutResponseDataType;
+  ):
+    | Promise<CheckoutResponseDataType>
+    | Observable<CheckoutResponseDataType>
+    | CheckoutResponseDataType;
 
   getPaymentLink(
     request: GetPaymentLinkRequest,
-  ): Promise<CheckoutResponseDataType> | Observable<CheckoutResponseDataType> | CheckoutResponseDataType;
+  ):
+    | Promise<CheckoutResponseDataType>
+    | Observable<CheckoutResponseDataType>
+    | CheckoutResponseDataType;
 
-  handleWebhook(request: WebhookType): Promise<WebhookDataType> | Observable<WebhookDataType> | WebhookDataType;
+  handleWebhook(
+    request: WebhookType,
+  ): Promise<WebhookDataType> | Observable<WebhookDataType> | WebhookDataType;
 
   getPaymentById(
     request: GetPaymentByIdRequest,
@@ -172,35 +193,55 @@ export interface PaymentServiceController {
 
   getPaymentHistory(
     request: PaymentRequest,
-  ): Promise<GetPaymentHistoryResponse> | Observable<GetPaymentHistoryResponse> | GetPaymentHistoryResponse;
+  ):
+    | Promise<GetPaymentHistoryResponse>
+    | Observable<GetPaymentHistoryResponse>
+    | GetPaymentHistoryResponse;
 
   getPaymentHistories(
     request: Empty,
-  ): Promise<GetPaymentHistoryResponse> | Observable<GetPaymentHistoryResponse> | GetPaymentHistoryResponse;
+  ):
+    | Promise<GetPaymentHistoryResponse>
+    | Observable<GetPaymentHistoryResponse>
+    | GetPaymentHistoryResponse;
 }
 
 export function PaymentServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      "test",
-      "getAllSubscription",
-      "createPaymentLink",
-      "getPaymentLink",
-      "handleWebhook",
-      "getPaymentById",
-      "getPaymentHistory",
-      "getPaymentHistories",
+      'test',
+      'getAllSubscription',
+      'createPaymentLink',
+      'getPaymentLink',
+      'handleWebhook',
+      'getPaymentById',
+      'getPaymentHistory',
+      'getPaymentHistories',
     ];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("PaymentService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcMethod('PaymentService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("PaymentService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcStreamMethod('PaymentService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
   };
 }
 
-export const PAYMENT_SERVICE_NAME = "PaymentService";
+export const PAYMENT_SERVICE_NAME = 'PaymentService';

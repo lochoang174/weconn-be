@@ -88,7 +88,10 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     const result = await this.model.deleteOne(filterQuery);
 
     if (result.deletedCount === 0) {
-      this.logger.warn('Document not found for deletion with filterQuery', filterQuery);
+      this.logger.warn(
+        'Document not found for deletion with filterQuery',
+        filterQuery,
+      );
       // Bạn có thể chọn throw NotFoundException hoặc trả về result tùy theo logic mong muốn
       // throw new NotFoundException('Document to delete not found.');
     }
@@ -104,7 +107,10 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     const result = await this.model.deleteMany(filterQuery);
 
     if (result.deletedCount === 0) {
-      this.logger.warn('No documents found for deletion with filterQuery', filterQuery);
+      this.logger.warn(
+        'No documents found for deletion with filterQuery',
+        filterQuery,
+      );
       // Tương tự, có thể throw hoặc không tùy logic
     }
     return result;
