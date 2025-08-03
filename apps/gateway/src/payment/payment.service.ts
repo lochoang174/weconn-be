@@ -92,10 +92,14 @@ export class PaymentService implements OnModuleInit {
       );
 
       if (payment.subscription.type === SubscriptionType.MONTHLY) {
-        this.userService.updateCredits(
+        // this.userService.updateCredits(
+        //   payment.userId,
+        //   payment.subscription.credits,
+        //   SubscriptionType.MONTHLY,
+        // );
+        this.userService.createSubscription(
           payment.userId,
-          payment.subscription.credits,
-          SubscriptionType.MONTHLY,
+          payment.subscription,
         );
       } else {
         this.userService.updateCredits(

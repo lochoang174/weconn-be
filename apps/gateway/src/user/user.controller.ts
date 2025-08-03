@@ -19,6 +19,7 @@ export class UserController {
       avatar: userData.avatar,
       credits: userData.credits,
       role: userData.role,
+      subscription: userData.subscription,
     };
   }
 }

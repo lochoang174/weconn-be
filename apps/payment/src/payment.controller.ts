@@ -1,5 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
+import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import PayOSClass from '@payos/node';
 import { WebhookDataType, WebhookType } from '@payos/node/lib/type';
 import { Types } from 'mongoose';
@@ -11,7 +11,7 @@ import {
 import { PaymentRepository } from './payment.repository';
 import { SubcriptionRepository } from './subcription/subcription.repository';
 import { stat } from 'fs';
-
+import { status } from '@grpc/grpc-js';
 @Controller()
 export class PaymentController {
   constructor(
@@ -49,6 +49,13 @@ export class PaymentController {
     data: CreatePaymentLinkRequest,
   ): Promise<CheckoutResponseDataType> {
     const CLIENT_DOMAIN = 'https://weconn-fe.vercel.app';
+    if (!data.subscriptionId || !Types.ObjectId.isValid(data.subscriptionId)) {
+      throw new RpcException({
+        code: status.INVALID_ARGUMENT,
+        message: `Invalid subscriptionId: ${data.subscriptionId}`,
+      });
+    }
+
     const subcription = await this.subcriptionRepository.findOne({
       _id: new Types.ObjectId(data.subscriptionId),
     });

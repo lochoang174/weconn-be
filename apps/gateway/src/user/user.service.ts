@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 
-import { SubscriptionType } from 'proto/payment';
-import { RoleEnum, User } from './schema/user.schema';
+import { Subscription, SubscriptionType } from 'proto/payment';
+import { RoleEnum, User, UserSubscription } from './schema/user.schema';
 import { UserRepository } from './user.repository';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,6 @@ export class UserService {
         email,
         role: RoleEnum.CLIENT,
         username: name,
-        type: SubscriptionType.EACH,
         credits: 10,
       });
     }
@@ -66,4 +66,77 @@ export class UserService {
       updateObject,
     );
   }
+
+  async createSubscription(
+    userId: string,
+    subscriptionData: Subscription,
+  ): Promise<User> {
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setDate(startDate.getDate() + 30); // 30 days from now
+
+    // Now all fields match your schema
+    const subscription: UserSubscription = {
+      _id: new Types.ObjectId(),
+      price: subscriptionData.price,
+      credits: subscriptionData.credits,
+      type: subscriptionData.type,
+      startDate,
+      endDate,
+      lastCreditDistribution: startDate,
+    };
+
+    return await this.userRepository.findOneAndUpdate(
+      { _id: userId },
+      {
+        $push: { subscription },
+        $inc: { credits: subscriptionData.credits }, // Give first day credits
+      },
+    );
+  }
+  // Update subscription credits
+  async updateSubscriptionCredits(
+    userId: string,
+    credits: number,
+  ): Promise<User> {
+    return await this.userRepository.findOneAndUpdate(
+      { _id: userId },
+      {
+        $inc: {
+          credits,
+          'subscription.creditsDistributed': credits,
+        },
+        'subscription.lastCreditDistribution': new Date(),
+      },
+    );
+  }
+
+  // Check if user has active subscriptio
+  // Get user's subscription info
+  // async getSubscriptionInfo(userId: string): Promise<UserSubscription | null> {
+  //   const user = await this.userRepository.findOne({ _id: userId });
+  //   return user?.subscription || null;
+  // }
+
+  // Deactivate subscription
+  async deactivateSubscription(userId: string): Promise<User> {
+    return await this.userRepository.findOneAndUpdate(
+      { _id: userId },
+      {
+        'subscription.isActive': false,
+      },
+    );
+  }
+
+  // Get subscription type from user's subscription
+  // async getUserSubscriptionType(userId: string): Promise<SubscriptionType> {
+  //   const user = await this.userRepository.findOne({ _id: userId });
+  //   return user?.subscription?.type || SubscriptionType.EACH;
+  // }
+
+  // // Check if subscription is monthly
+  // async isMonthlySubscriber(userId: string): Promise<boolean> {
+  //   const user = await this.userRepository.findOne({ _id: userId });
+  //   return user?.subscription?.type === SubscriptionType.MONTHLY;
+  // }
 }
