@@ -20,7 +20,9 @@ export class CrawlRepository extends AbstractRepository<Url> {
   }
 
   async getUrlsNotCompleted() {
-    let urls = await this.model.find({ status: { $ne: 'completed' } }).exec();
+    let urls = await this.model.find({
+      status: { $nin: ['completed', 'failed'] }
+    }).exec();
     return urls.map((url) => this.getLinkedInUsername(url.url)).filter(Boolean);
   }
 

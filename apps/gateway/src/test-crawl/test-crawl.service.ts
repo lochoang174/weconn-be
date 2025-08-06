@@ -16,8 +16,8 @@ export class TestCrawlService {
   async onModuleInit() {
     this.botCrudService =
       this.clientGrpc.getService<BotCrudServiceClient>('BotCrudService');
-    let total = await this.crawlRepository.getUrlsNotCompleted();
-    console.log(total);
+    // let total = await this.crawlRepository.getUrlsNotCompleted();
+    // console.log(total);
   }
   async getListProfile(payload: CrawlListProfileDto) {
     try {
@@ -254,7 +254,22 @@ export class TestCrawlService {
           // Transform data thành TransformedLinkedInProfile format
           const result = this.transformSaucurlData(data);
           console.log(`Transformed profile data for ${username}:`, result);
+          if(result.picture===''){
+             // Cập nhật status thành failed
+            await this.crawlRepository.updateUrlStatus(
+              result.url,
+              'failed',
+            );
+            console.log(`Updated status to failed for username: ${username}`);
 
+            results.push({
+              username: username,
+              originalData: data,
+              transformedData: result,
+              status: 'failed',
+            });
+            continue;
+          } 
           try {
             const res = await firstValueFrom(
               this.botCrudService.saveVector({

@@ -3,6 +3,9 @@ syntax = "proto3";
 package bot_crud;
 
 service BotCrudService {
+  rpc ListVectors(ListVectorsRequest) returns (ListVectorsResponse);
+  rpc RemoveVectors(RemoveRequest) returns (RemoveResponse);
+
   rpc DetectFacesPublic(FaceDetectRequest) returns (FaceDetectResponse);
   rpc DetectFacesPrivate(FaceDetectRequestPrivate) returns (FaceDetectPrivateResponse);
 
@@ -194,4 +197,37 @@ message GetDetailHistoryResponseElement {
 message GetDetailHistoryResponse {
   repeated GetDetailHistoryResponseElement results = 1;
   string url =2;
+}
+message ListVectorsRequest {
+  int32 page = 1;       // Số trang muốn lấy (ví dụ: 1, 2, 3, ...)
+  int32 page_size = 2;  // Số lượng item trên mỗi trang (ví dụ: 10)
+}
+
+// Message chứa thông tin chi tiết của một document
+// Tương ứng với một object trong mảng 'data' của response JSON
+message VectorData {
+  string id = 1;                // ID của document trong Elasticsearch
+  string url = 2;                 // URL LinkedIn
+  string name = 3;                // Tên
+  string picture = 4;             // URL ảnh trên Cloudinary
+  string headline = 5;            // Dòng tiêu đề
+  string location = 6;            // Vị trí
+  string current_company = 7;     // Công ty hiện tại
+  optional string education = 8;  // Học vấn (có thể null, nên dùng optional)
+  string created_at = 9;          // Thời gian tạo (dạng chuỗi ISO 8601)
+}
+
+message RemoveRequest{
+  repeated string req = 1;
+}
+
+message RemoveResponse  {
+  bool res = 1;
+}
+// Message cho response, cấu trúc tương tự như JSON bạn đã cung cấp
+message ListVectorsResponse {
+  repeated VectorData data = 1; // Danh sách các document trả về
+  int32 total_items = 2;        // Tổng số item có trong database
+  int32 total_pages = 3;        // Tổng số trang
+  int32 current_page = 4;       // Trang hiện tại được trả về
 }

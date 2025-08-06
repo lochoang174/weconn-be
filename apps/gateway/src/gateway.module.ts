@@ -22,6 +22,7 @@ import { TestCrawlModule } from './test-crawl/test-crawl.module';
 import { GuestModule } from './guest/guest.module';
 import { PaymentModule } from './payment/payment.module';
 import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.module';
+import { DataModule } from './data/data.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.modu
     GuestModule,
     PaymentModule,
     SubcriptionModule,
+    DataModule,
     // SagaStepModule,
     // SagaInstanceModule,
   ],
@@ -60,3 +62,4 @@ import { SubcriptionModule } from 'apps/payment/src/subcription/subcription.modu
   providers: [GatewayService],
 })
 export class GatewayModule {}
+ 

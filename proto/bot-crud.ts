@@ -188,9 +188,67 @@ export interface GetDetailHistoryResponse {
   url: string;
 }
 
+export interface ListVectorsRequest {
+  /** Số trang muốn lấy (ví dụ: 1, 2, 3, ...) */
+  page: number;
+  /** Số lượng item trên mỗi trang (ví dụ: 10) */
+  pageSize: number;
+}
+
+/**
+ * Message chứa thông tin chi tiết của một document
+ * Tương ứng với một object trong mảng 'data' của response JSON
+ */
+export interface VectorData {
+  /** ID của document trong Elasticsearch */
+  id: string;
+  /** URL LinkedIn */
+  url: string;
+  /** Tên */
+  name: string;
+  /** URL ảnh trên Cloudinary */
+  picture: string;
+  /** Dòng tiêu đề */
+  headline: string;
+  /** Vị trí */
+  location: string;
+  /** Công ty hiện tại */
+  currentCompany: string;
+  /** Học vấn (có thể null, nên dùng optional) */
+  education?:
+    | string
+    | undefined;
+  /** Thời gian tạo (dạng chuỗi ISO 8601) */
+  createdAt: string;
+}
+
+export interface RemoveRequest {
+  req: string[];
+}
+
+export interface RemoveResponse {
+  res: boolean;
+}
+
+/** Message cho response, cấu trúc tương tự như JSON bạn đã cung cấp */
+export interface ListVectorsResponse {
+  /** Danh sách các document trả về */
+  data: VectorData[];
+  /** Tổng số item có trong database */
+  totalItems: number;
+  /** Tổng số trang */
+  totalPages: number;
+  /** Trang hiện tại được trả về */
+  currentPage: number;
+}
+
 export const BOT_CRUD_PACKAGE_NAME = "bot_crud";
 
 export interface BotCrudServiceClient {
+  listVectors(request: ListVectorsRequest): Observable<ListVectorsResponse>;
+
+  removeVectors(request: RemoveRequest): Observable<RemoveResponse>;
+
   detectFacesPublic(request: FaceDetectRequest): Observable<FaceDetectResponse>;
 
   detectFacesPrivate(request: FaceDetectRequestPrivate): Observable<FaceDetectPrivateResponse>;
@@ -219,6 +277,12 @@ export interface BotCrudServiceClient {
 }
 
 export interface BotCrudServiceController {
+  listVectors(
+    request: ListVectorsRequest,
+  ): Promise<ListVectorsResponse> | Observable<ListVectorsResponse> | ListVectorsResponse;
+
+  removeVectors(request: RemoveRequest): Promise<RemoveResponse> | Observable<RemoveResponse> | RemoveResponse;
+
   detectFacesPublic(
     request: FaceDetectRequest,
   ): Promise<FaceDetectResponse> | Observable<FaceDetectResponse> | FaceDetectResponse;
@@ -267,6 +331,8 @@ export interface BotCrudServiceController {
 export function BotCrudServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
+      "listVectors",
+      "removeVectors",
       "detectFacesPublic",
       "detectFacesPrivate",
       "searchFacePublic",
